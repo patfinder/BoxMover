@@ -1,32 +1,44 @@
 
 const CellState = {
 	// Low nibble
-	Blank: 0x00,
-	Hole:  0x01,
+	Blank: 0x01,
+	Hole:  0x02,
 	// High nible
 	Wall:  0x10,
 	Box:   0x20,
 	// Man:   0x40,
 
-	LNibble: 0x0F,
-	HNibble: 0xF0,
+	// Get Blank or Hole part
+	BaseNib: 0x0F,
+	// Get Wall, Box, Man part
+	ObjNib: 0xF0,
 };
 
 const Direction = {
-	Left: 0,
-	Right: 1,
-	Top: 2,
-	Bottom: 3,
+	Left:	0x01,
+	Right:	0x02,
+	Top:	0x10,
+	Bottom: 0x20,
+
+	XNib: 0x0F,
+	YNib: 0xF0,
 }
 
 /**
- * Find next cell of specified cell
- * @param {any} x
- * @param {any} y
- * @param {any} dir dir relating to current position.
+ * Get next pos of specified pos
+ * @param {Pos} pos current pos
+ * @param {any} dir move direction
  */
-function nextCell(x, y, dir) {
+function nextCell(pos, dir) {
+	var dx = 0, dy = 0;
+	if (dir & Direction.XNibble) {
+		dx = dir & Direction.Left ? -1 : 1;
+	}
+	else {
+		dy = dir & Direction.Top ? -1 : 1;
+	}
 
+	return new Pos(pox.x + dx, pos.y + dy);
 }
 
 class Pos {
@@ -35,12 +47,16 @@ class Pos {
 		this.y = y;
 	}
 
-	eq(pos) {
+	equal(pos) {
 		return pos.x === this.x && pos.y === this.y;
     }
 }
 
 class Board {
+
+	/**
+	 * Note: x = 0: top, y = 0: left
+	 */
 
 	/**
 	 * 
@@ -52,10 +68,10 @@ class Board {
 		this.height = height;
 		this.width = width;
 
-		// Array of [row][column]
-		this.cells = new Array(height);
-		for (var i = 0; i < height; i++) {
-			this.cells[i] = new Array(width);
+		// Array of [column][row]
+		this.cells = new Array(width);
+		for (var x = 0; x < width; x++) {
+			this.cells[x] = new Array(height);
 		}
 
 		this.boxCount = 0;
@@ -65,35 +81,36 @@ class Board {
 	}
 
 	/**
-	 * Initialize cell value 
-	 * @param {Number} x
-	 * @param {Number} y
+	 * Initialize cell value
+	 * @param {Pos} pos cell position
 	 * @param {CellState} state
 	 */
-	initCell(x, y, state) {
-		if (y >= this.height) throw `Invalid row value ${y}`;
+	initCell(pos, state) {
+		var { x, y } = pos;
 		if (x >= this.width) throw `Invalid col value ${x}`;
+		if (y >= this.height) throw `Invalid row value ${y}`;
 
 		// TODO: check state value
 
 		// Set box
 		if (state & CellState.Box) {
-			if (this.cells[y][x] & CellState.Box === 0) this.boxCount++;
+			if ((this.cells[x][y] & CellState.Box) === 0) this.boxCount++;
 		}
 		else {
 			// Clear box
-			if (this.cells[y][x] & CellState.Box) this.boxCount--;
+			if (this.cells[x][y] & CellState.Box) this.boxCount--;
 		}
 
-		this.cells[y][x] = state;
+		this.cells[x][y] = state;
 	}
 
 	/**
-	 * Check if a cell is empty (Zero on high nibble)
+	 * Check if a cell is empty (empty on high nibble)
 	 * @param {any} pos
 	 */
 	isEmpty(pos) {
-		return this.cells[pos.x][pos.y] & CellState.HNibble === 0;
+		var { x, y } = pos;
+		return (this.cells[x][y] & CellState.ObjNib) === 0;
     }
 
 	/**
@@ -117,34 +134,32 @@ class Board {
 
 		// Brute Force algorithm
 		var found = true;
-		var cells = [];
+		var poss = [];
 
 		// Directions for selecting a move
 		var dirs = [Direction.Left, Direction.Right, Direction.Top, Direction.Bottom];
 		while (found) {
-			// Try 1 of 4 dirs
-			for (let d = 0; d < 4; d++) {
-
-            }
+			let nextPos = this.findMove(poss);
         }
 	}
 
 	/**
 	 * Find a cell adjacent cell that can move.
-	 * @param {[pos]} cells current cells in the area
+	 * @param {[Pos]} poss current cells in the area
+	 * @returns {Pos} next movable position
 	 */
-	findMove(cells) {
-
+	findMove(poss) {
 		var dirs = [Direction.Left, Direction.Right, Direction.Top, Direction.Bottom];
 
 		// For each of current cells, check if adjacent cells can move
-		for (let i = 0; i < cells.length; i++) {
+		for (let i = 0; i < poss.length; i++) {
+			let pos = poss[i];
 
-			let cell = cells[i];
+			// Loop on dirs
 			for (let j = 0; j < 4; j++) {
 				let dir = dirs[j];
-				let nextPos = nextCell(cell.x, cell.y, dir);
-				if(this.isEmpty(nextPos) && cells.every(c => c.x !== ))
+				let nextPos = nextCell(pos, dir);
+				if (this.isEmpty(nextPos) && poss.every(p => !nextPos.equal(p))) return nextPos;
 			}
         }
     }
