@@ -1,58 +1,8 @@
+import CellState from './CellState';
+import Direction from './Direction';
+import Position from './Position';
 
-const CellState = {
-	// Low nibble
-	Blank: 0x01,
-	Hole:  0x02,
-	// High nible
-	Wall:  0x10,
-	Box:   0x20,
-	// Man:   0x40,
-
-	// Get Blank or Hole part
-	BaseNib: 0x0F,
-	// Get Wall, Box, Man part
-	ObjNib: 0xF0,
-};
-
-const Direction = {
-	Left:	0x01,
-	Right:	0x02,
-	Top:	0x10,
-	Bottom: 0x20,
-
-	XNib: 0x0F,
-	YNib: 0xF0,
-}
-
-/**
- * Get next pos of specified pos
- * @param {Pos} pos current pos
- * @param {any} dir move direction
- */
-function nextCell(pos, dir) {
-	var dx = 0, dy = 0;
-	if (dir & Direction.XNibble) {
-		dx = dir & Direction.Left ? -1 : 1;
-	}
-	else {
-		dy = dir & Direction.Top ? -1 : 1;
-	}
-
-	return new Pos(pox.x + dx, pos.y + dy);
-}
-
-class Pos {
-	constructor(x, y) {
-		this.x = x;
-		this.y = y;
-	}
-
-	equal(pos) {
-		return pos.x === this.x && pos.y === this.y;
-    }
-}
-
-class Board {
+export class Board {
 
 	/**
 	 * Note: x = 0: top, y = 0: left
@@ -62,7 +12,7 @@ class Board {
 	 * 
 	 * @param {any} width
 	 * @param {any} height
-	 * @param {Pos} manPos Man's initial position
+	 * @param {Position} manPos Man's initial position
 	 */
 	constructor(width, height, manPos) {
 		this.height = height;
@@ -76,13 +26,12 @@ class Board {
 
 		this.boxCount = 0;
 		// Man position
-		this.x = manPos.x;
-		this.y = manPos.y;
+		this.pos = new Position(manPos.x, manPos.y);
 	}
 
 	/**
 	 * Initialize cell value
-	 * @param {Pos} pos cell position
+	 * @param {Position} pos cell position
 	 * @param {CellState} state
 	 */
 	initCell(pos, state) {
@@ -102,6 +51,28 @@ class Board {
 		}
 
 		this.cells[x][y] = state;
+	}
+
+	/**
+	 * Get next pos of specified pos
+	 * @param {Position} pos current pos
+	 * @param {any} dir move direction
+	 */
+	nextCell(pos, dir) {
+		var dx = 0, dy = 0;
+		if (dir & Direction.XNibble) {
+			dx = dir & Direction.Left ? -1 : 1;
+		}
+		else {
+			dy = dir & Direction.Top ? -1 : 1;
+		}
+
+		var newPos = new Position(pox.x + dx, pos.y + dy);
+		var { x, y } = newPos;
+
+		if (x >= 0 && x < this.width && y >= 0 && y < this.height) return nextPos;
+
+		return undefined;
 	}
 
 	/**
@@ -128,38 +99,48 @@ class Board {
 	 * @param {pos} pos
 	 */
 	canMove(pos) {
-		var { x, y } = pos;
 		// No move
-		if (this.x === x && this.y === y) return true;
+		if (this.manPos.equal(pos)) return true;
 
+		// Find all adjacent positions
 		// Brute Force algorithm
-		var found = true;
-		var poss = [];
+		var poss = [this.manPos];
 
-		// Directions for selecting a move
-		var dirs = [Direction.Left, Direction.Right, Direction.Top, Direction.Bottom];
-		while (found) {
+		for (; ;) {
 			let nextPos = this.findMove(poss);
-        }
+			if (nextPos === undefined) return false;
+
+			// Reach the pos
+			if (nextPos.equal(pos)) return true;
+
+			// Add pos, continue searching
+			pos.push(nextPos);
+		}
 	}
 
 	/**
-	 * Find a cell adjacent cell that can move.
-	 * @param {[Pos]} poss current cells in the area
-	 * @returns {Pos} next movable position
+	 * Find a cell adjacent to cells that can move
+	 * @param {[Position]} poss current cells in the zone
+	 * @returns {Position} next movable position
 	 */
 	findMove(poss) {
 		var dirs = [Direction.Left, Direction.Right, Direction.Top, Direction.Bottom];
 
-		// For each of current cells, check if adjacent cells can move
+		// For each of current cells, check if adjacent cells can walk
 		for (let i = 0; i < poss.length; i++) {
 			let pos = poss[i];
 
 			// Loop on dirs
 			for (let j = 0; j < 4; j++) {
 				let dir = dirs[j];
-				let nextPos = nextCell(pos, dir);
-				if (this.isEmpty(nextPos) && poss.every(p => !nextPos.equal(p))) return nextPos;
+
+				let nextPos = this.nextCell(pos, dir);
+				if (nextPos === undefined) continue;
+
+				// Check if pos is walked
+				if (this.isEmpty(nextPos) && poss.every(p => !nextPos.equal(p))) {
+					return nextPos;
+				}
 			}
         }
     }
