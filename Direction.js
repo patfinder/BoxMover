@@ -1,4 +1,4 @@
-export const Direction = {
+const Direction = {
 	Left: 0x01,
 	Right: 0x02,
 	Top: 0x10,
@@ -7,3 +7,5 @@ export const Direction = {
 	XNib: 0x0F,
 	YNib: 0xF0,
 }
+
+export default Direction;

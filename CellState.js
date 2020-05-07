@@ -12,3 +12,5 @@ const CellState = {
 	// Get Wall, Box, Man part
 	ObjNib: 0xF0,
 };
+
+export default CellState;

@@ -2,7 +2,20 @@ import CellState from './CellState';
 import Direction from './Direction';
 import Position from './Position';
 
-export class Board {
+/**
+ * Get representing char of cell state
+ * @param {CellState} cellState
+ */
+export function cellChar(cellState) {
+	if (cellState & CellState.Wall)  return 'H';
+	if (cellState & CellState.Box)   return 'X';
+	if (cellState & CellState.Hole)  return 'O';
+    if (cellState & CellState.Blank) return ' ';
+
+	return undefined;
+}
+
+export default class Board {
 
 	/**
 	 * Note: x = 0: top, y = 0: left
@@ -10,23 +23,23 @@ export class Board {
 
 	/**
 	 * 
-	 * @param {any} width
-	 * @param {any} height
+	 * @param {any} X
+	 * @param {any} Y
 	 * @param {Position} manPos Man's initial position
 	 */
-	constructor(width, height, manPos) {
-		this.height = height;
-		this.width = width;
+	constructor(X, Y, manPos) {
+		this.X = X;
+		this.Y = Y;
 
-		// Array of [column][row]
-		this.cells = new Array(width);
-		for (var x = 0; x < width; x++) {
-			this.cells[x] = new Array(height);
+		// X: first index, Y: second index
+		this.cells = new Array(X);
+		for (var x = 0; x < X; x++) {
+			this.cells[x] = new Array(Y);
 		}
 
 		this.boxCount = 0;
 		// Man position
-		this.pos = new Position(manPos.x, manPos.y);
+		this.manPos = new Position(manPos.x, manPos.y);
 	}
 
 	/**
@@ -36,8 +49,8 @@ export class Board {
 	 */
 	initCell(pos, state) {
 		var { x, y } = pos;
-		if (x >= this.width) throw `Invalid col value ${x}`;
-		if (y >= this.height) throw `Invalid row value ${y}`;
+		if (x >= this.X) throw `Invalid x value ${x}`;
+		if (y >= this.Y) throw `Invalid y value ${y}`;
 
 		// TODO: check state value
 
@@ -52,6 +65,24 @@ export class Board {
 
 		this.cells[x][y] = state;
 	}
+
+	/**
+	 * Initialize board
+	 * @param {CellState[x][y]} board of cell states
+	 */
+	initBoard(board) {
+		for (let x = 0; x < board.length; x++) {
+			for (let y = 0; y < board[x].length; y++) {
+				this.initCell(new Position(x, y), board[x][y]);
+            }
+        }
+	}
+
+	validate() {
+		// TODO: validate if board is valid
+		// Box count = Hole count
+		// Man position is in the board
+    }
 
 	/**
 	 * Get next pos of specified pos
@@ -70,7 +101,7 @@ export class Board {
 		var newPos = new Position(pox.x + dx, pos.y + dy);
 		var { x, y } = newPos;
 
-		if (x >= 0 && x < this.width && y >= 0 && y < this.height) return nextPos;
+		if (x >= 0 && x < this.X && y >= 0 && y < this.Y) return nextPos;
 
 		return undefined;
 	}
@@ -92,6 +123,17 @@ export class Board {
 		// TODO
 		//return this.boxCount === board2.boxCount
 	}
+
+	print() {
+		for (let x = 0; x < this.X; x++) {
+			let row = '';
+			for (let y = 0; y < this.Y; y++) {
+				if (new Position(x, y).equal(this.manPos)) row += 'M';
+				else row += cellChar(this.cells[x][y]);
+			}
+			console.log(row);
+        }
+    }
 
 	/**
 	 * Check if Man can move to specified position.
