@@ -16,6 +16,8 @@ var states = [
     [H, H, H, H, H, H, H, H],
 ];
 
+debugger;
+
 var XX = states.length;
 var YY = states[0].length;
 

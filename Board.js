@@ -98,10 +98,10 @@ export default class Board {
 			dy = dir & Direction.Top ? -1 : 1;
 		}
 
-		var newPos = new Position(pox.x + dx, pos.y + dy);
-		var { x, y } = newPos;
-
-		if (x >= 0 && x < this.X && y >= 0 && y < this.Y) return nextPos;
+		var x = pos.x + dx, y = pos.y + dy;
+		if (x >= 0 && x < this.X && y >= 0 && y < this.Y) {
+			return new Position(x, y);
+		}
 
 		return undefined;
 	}
@@ -145,18 +145,19 @@ export default class Board {
 		if (this.manPos.equal(pos)) return true;
 
 		// Find all adjacent positions
-		// Brute Force algorithm
-		var poss = [this.manPos];
+		var zone = [this.manPos];
 
 		for (; ;) {
-			let nextPos = this.findMove(poss);
+			let nextPos = this.findMove(zone);
+
+			// Cannot find new pos
 			if (nextPos === undefined) return false;
 
 			// Reach the pos
 			if (nextPos.equal(pos)) return true;
 
-			// Add pos, continue searching
-			pos.push(nextPos);
+			// Expand zone to newPos, continue searching
+			zone.push(nextPos);
 		}
 	}
 
