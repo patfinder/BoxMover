@@ -296,3 +296,5 @@ ncinetws.code-workspace
 # VSCode
 .vscode
 
+# VS
+.vs
