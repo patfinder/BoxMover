@@ -1,22 +1,25 @@
 {
   "name": "boxmover",
   "version": "1.0.0",
-  "description": "This README would normally document whatever steps are necessary to get your application up and running.",
-  "main": "Board.js",
+  "main": "Game.js",
   "scripts": {
-    "start": "babel-node --presets es2015 game.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node Game.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://patfinder@bitbucket.org/patfinder/boxmover.git"
-  },
-  "author": "",
-  "license": "ISC",
-  "homepage": "https://bitbucket.org/patfinder/boxmover#readme",
+  "license": "MIT",
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-preset-es2015": "^6.24.1",
-    "eslint": "^6.8.0"
+    "babel-preset-env": "^1.6.1",
+    "babel-register": "^6.26.0"
+  },
+  "babel": {
+    "presets": [
+      "env"
+    ],
+    "sourceMaps": true,
+    "retainLines": true
+  },
+  "dependencies": {
+    "es6-promise": "^4.0.5",
+    "isomorphic-fetch": "^2.2.1"
   }
 }

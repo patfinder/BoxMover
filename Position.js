@@ -8,4 +8,8 @@ export default class Position {
 	equal(pos) {
 		return pos.x === this.x && pos.y === this.y;
 	}
+
+	toString(){
+		return `{${this.x}, ${this.y}}`;
+	}
 }
