@@ -18,8 +18,8 @@ export default class Cell {
         this.value = value;
     }
 
-    copy(cell) {
-        return new Cell(cell.value);
+    copy() {
+        return new Cell(this.value);
     }
 
     get isBlank() { return Boolean(this.value & BlankFlag); }
@@ -35,11 +35,11 @@ export default class Cell {
      * Get representing char of cell state
      * @param {Cell} value
      */
-    toChar() {
+    get char() {
         var value = this.value;
 
-        //if (value & WallFlag)  return 'H';
-        if (value & WallFlag) return String.fromCharCode(219);
+        if (value & WallFlag)  return 'H';
+        // if (value & WallFlag) return String.fromCharCode(219);
         if (value & BoxFlag) return 'X';
         // Occupied Hole
         if (value & BoxFlag && value & HoleFlag) {
@@ -53,14 +53,10 @@ export default class Cell {
     }
 
     get isValidState() {
-        var value = this.value;
 
-        var base = value & BaseNibFlags;
-        var obj = value & ObjNibFlags;
+        if (this.isBlank && this.isHole) return false;
 
-        if (obj !== BlankFlag && obj !== HoleFlag) return false;
-
-        if (base !== WallFlag && base !== BoxFlag) return false;
+        if (this.isWall && this.isBox) return false;
 
         return true;
     }

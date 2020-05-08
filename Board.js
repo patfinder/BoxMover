@@ -1,5 +1,5 @@
 import Cell from './Cell';
-import Direction from './Direction';
+import { LeftFlag, RightFlag, TopFlag, BottomFlag } from './Direction';
 import Position from './Position';
 
 export default class Board {
@@ -28,9 +28,9 @@ export default class Board {
 	/**
 	 * Initialize cell value
 	 * @param {Position} pos cell position
-	 * @param {Cell} state
+	 * @param {Cell} cell
 	 */
-	initCell(pos, state) {
+	initCell(pos, cell) {
 		var { x, y } = pos;
 		if (x >= this.X) throw `Invalid x value ${x}`;
 		if (y >= this.Y) throw `Invalid y value ${y}`;
@@ -38,15 +38,15 @@ export default class Board {
 		// TODO: check state value
 
 		// Set box
-		if (state.isBox) {
-			if ((this.cells[x][y].isBox) === 0) this.boxCount++;
-		}
-		else {
-			// Clear box
-			if (this.cells[x][y].isBox) this.boxCount--;
-		}
+		// if (cell.isBox) {
+		// 	if ((this.cells[x][y].isBox) === 0) this.boxCount++;
+		// }
+		// else {
+		// 	// Clear box
+		// 	if (this.cells[x][y].isBox) this.boxCount--;
+		// }
 
-		this.cells[x][y] = state;
+		this.cells[x][y] = cell.copy();
 	}
 
 	/**
@@ -116,30 +116,10 @@ export default class Board {
 		}
 		
 		// Box count = Hole count
-		if(boxCount !== holeCount) return false;
+		if(boxCount !== holeCount) return `Box count (${boxCount}) != Hole count (${holeCount})`;
+
+		return false;
     }
-
-	/**
-	 * Get next pos of specified pos
-	 * @param {Position} pos current pos
-	 * @param {any} dir move direction
-	 */
-	nextCell(pos, dir) {
-		var dx = 0, dy = 0;
-		if (dir & Direction.XNibble) {
-			dx = dir & Direction.Left ? -1 : 1;
-		}
-		else {
-			dy = dir & Direction.Top ? -1 : 1;
-		}
-
-		var newPos = new Position(pos.x + dx, pos.y + dy);
-		if (this.isInBoard(newPos)) {
-			return newPos;
-		}
-
-		return undefined;
-	}
 
 	/**
 	 * Check if a cell is empty (Blank or Hole)
@@ -147,7 +127,7 @@ export default class Board {
 	 */
 	isEmpty(pos) {
 		var { x, y } = pos;
-		return (this.cells[x][y] & Cell.ObjNib) === 0;
+		return this.cells[x][y].ObjNib === 0;
 	}
 
 	/**
@@ -176,7 +156,7 @@ export default class Board {
 			let row = '';
 			for (let y = 0; y < this.Y; y++) {
 				if (new Position(x, y).equal(this.manPos)) row += 'M';
-				else row += this.cells[x][y].toChar();
+				else row += this.cells[x][y].char;
 			}
 			console.log(row);
         }
@@ -205,30 +185,32 @@ export default class Board {
 
 			// Expand zone to newPos, continue searching
 			zone.push(nextPos);
+
+			console.log(`Zone: ${zone.map(p => p.toString()).join(', ')}`);
 		}
 	}
 
 	/**
 	 * Find a cell adjacent to cells that can move
-	 * @param {[Position]} poss current cells in the zone
+	 * @param {[Position]} zone current cells in the zone
 	 * @returns {Position} next movable position
 	 */
-	findMove(poss) {
-		var dirs = [Direction.Left, Direction.Right, Direction.Top, Direction.Bottom];
+	findMove(zone) {
+		var dirs = [LeftFlag, RightFlag, TopFlag, BottomFlag];
 
-		// For each of current cells, check if adjacent cells can walk
-		for (let i = 0; i < poss.length; i++) {
-			let pos = poss[i];
+		// For each cell in zone, check if adjacent cells can walk
+		for (let i = 0; i < zone.length; i++) {
+			let pos = zone[i];
 
 			// Loop on dirs
 			for (let j = 0; j < 4; j++) {
 				let dir = dirs[j];
 
-				let nextPos = this.nextCell(pos, dir);
+				let nextPos = pos.adjacent(dir);
 				if (nextPos === undefined) continue;
 
 				// Check if pos is walked
-				if (this.isEmpty(nextPos) && poss.every(p => !nextPos.equal(p))) {
+				if (this.isEmpty(nextPos) && zone.every(p => !nextPos.equal(p))) {
 					return nextPos;
 				}
 			}
