@@ -6,11 +6,6 @@ export const BottomFlag  = 0x20;
 export const XFlags = 0x0F;
 export const YFlags = 0xF0;
 
-export const Left = new Direction(LeftFlag);
-export const Right = new Direction(RightFlag);
-export const Top = new Direction(TopFlag);
-export const Bottom = new Direction(BottomFlag);
-
 export default class Direction {
 
     /**
@@ -27,10 +22,10 @@ export default class Direction {
     get isX() { return Boolean(this.value & XFlags); }
     get isY() { return Boolean(this.value & YFlags); }
 
-    get isLeft() { return Boolean(this.value & LeftFlags); }
-    get isRight() { return Boolean(this.value & RightFlags); }
-    get isTop() { return Boolean(this.value & TopFlags); }
-    get isBottom() { return Boolean(this.value & BottomFlags); }
+    get isLeft() { return Boolean(this.value & LeftFlag); }
+    get isRight() { return Boolean(this.value & RightFlag); }
+    get isTop() { return Boolean(this.value & TopFlag); }
+    get isBottom() { return Boolean(this.value & BottomFlag); }
 
     get char() {
         if (this.value === LeftFlag) return 'L';
@@ -41,3 +36,8 @@ export default class Direction {
         return '';
     }
 }
+
+export const Left = new Direction(LeftFlag);
+export const Right = new Direction(RightFlag);
+export const Top = new Direction(TopFlag);
+export const Bottom = new Direction(BottomFlag);

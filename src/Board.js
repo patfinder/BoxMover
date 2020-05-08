@@ -1,5 +1,5 @@
 import Cell from './Cell';
-import { LeftFlag, RightFlag, TopFlag, BottomFlag } from './Direction';
+import { Left, Top, Right, Bottom } from './Direction';
 import Position from './Position';
 
 export default class Board {
@@ -180,11 +180,13 @@ export default class Board {
 			// Cannot find new pos
 			if (nextPos === undefined) return false;
 
-			// Reach the pos
-			if (nextPos.equal(pos)) return true;
-
 			// Expand zone to newPos, continue searching
 			zone.push(nextPos);
+
+			// Reach the pos
+			if (nextPos.equal(pos)) {
+				return true;
+			}
 
 			console.log(`Zone: ${zone.map(p => p.toString()).join(', ')}`);
 		}
@@ -196,7 +198,7 @@ export default class Board {
 	 * @returns {Position} next movable position
 	 */
 	findMove(zone) {
-		var dirs = [LeftFlag, RightFlag, TopFlag, BottomFlag];
+		var dirs = [Left, Right, Top, Bottom];
 
 		// For each cell in zone, check if adjacent cells can walk
 		for (let i = 0; i < zone.length; i++) {
@@ -206,12 +208,12 @@ export default class Board {
 			for (let j = 0; j < 4; j++) {
 				let dir = dirs[j];
 
-				let nextPos = pos.adjacent(dir);
-				if (nextPos === undefined) continue;
+				let newPos = pos.adjacent(dir);
+				if (!this.isInBoard(newPos)) continue;
 
 				// Check if pos is walked
-				if (this.isEmpty(nextPos) && zone.every(p => !nextPos.equal(p))) {
-					return nextPos;
+				if (this.isEmpty(newPos) && zone.every(p => !newPos.equal(p))) {
+					return newPos;
 				}
 			}
         }

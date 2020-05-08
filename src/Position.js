@@ -29,11 +29,6 @@ export default class Position {
 		}
 		else throw `Invalid dir ${dir.char}`;
 
-		var newPos = new Position(x + dx, y + dy);
-		if (this.isInBoard(newPos)) {
-			return newPos;
-		}
-
-		return undefined;
+		return new Position(x + dx, y + dy);
 	}
 }
