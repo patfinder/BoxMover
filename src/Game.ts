@@ -30,8 +30,6 @@ try {
         }
     }
 
-    console.log('Testing .......');
-
     const board = new Board(XX, YY);
     board.initBoard(states, new Position(1, 1));
     board.printBoard();
@@ -41,5 +39,6 @@ try {
 }
 catch (error) {
     console.log('Error', error);
-    console.log('wait');
 }
+
+console.log('wait');

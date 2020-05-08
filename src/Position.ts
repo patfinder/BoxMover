@@ -35,4 +35,26 @@ export default class Position {
 
 		return new Position(x + dx, y + dy);
 	}
+
+	/**
+	 * Get x distance to target pos.
+	 * @param x
+	 * @returns positive value if target is on the right side of this point
+	 */
+	distanceX(x: number) {
+		return x - this.x;
+	}
+
+	/**
+	 * Get y distance to target pos.
+	 * @param y
+	 * @returns positive value if target is on the bottom side of this point
+	 */
+	distanceY(y: number) {
+		return y - this.y;
+	}
+
+	toMove(pos: Position) {
+
+    }
 }

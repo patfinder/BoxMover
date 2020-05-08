@@ -123,7 +123,7 @@ export default class Board {
 		// Box count = Hole count
 		if(boxCount !== holeCount) return `Box count (${boxCount}) != Hole count (${holeCount})`;
 
-		return null;
+		return '';
     }
 
 	/**
@@ -154,11 +154,13 @@ export default class Board {
 
 	printBoard() {
 
-		console.log(`X: ${this.X}, Y: ${this.Y} - isValid: ${this.validate()}`);
+		console.log(`X: ${this.X}, Y: ${this.Y} - valid: ${this.validate()}`);
 		console.log(`Man: ${this.manPos.x}, ${this.manPos.y}`);
 
+		const cols = [...Array(this.Y).keys()].join('');
+		console.log(` ${cols}`);
 		for (let x = 0; x < this.X; x++) {
-			let row = '';
+			let row = `${x}`;
 			for (let y = 0; y < this.Y; y++) {
 				if (new Position(x, y).equal(this.manPos)) row += 'M';
 				else row += cChar(this.cells[x][y]);
@@ -172,7 +174,7 @@ export default class Board {
 	 * True if there is a path between Man's pos and the position.
 	 * @param {pos} pos
 	 */
-	canMove(pos) {
+	canMove(pos: Position) {
 		// No move
 		if (this.manPos.equal(pos)) return true;
 
@@ -225,5 +227,13 @@ export default class Board {
 				}
 			}
         }
-    }
+	}
+
+	/**
+	 * Find Man shortest path to specified pos
+	 * @param pos target pos
+	 */
+	shortestPath(pos: Position) {
+
+	}
 }
