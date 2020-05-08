@@ -1,36 +1,45 @@
-import Cell, { BlankFlag, HoleFlag, WallFlag, BoxFlag } from './Cell';
+import Cell, { isValidState, char as cChar } from './Cell';
 import Board from './Board';
 import Position from './Position';
 
-const O = new Cell(HoleFlag);
-const _ = new Cell(BlankFlag);
-const H = new Cell(WallFlag);
-const X = new Cell(BoxFlag);
 
-var states = [
-    [H, H, H, H, H, H, H, H],
-    [H, _, _, _, _, _, _, H],
-    [H, _, _, _, _, X, H, H],
-    [H, _, _, _, _, H, _, H],
-    [H, _, _, _, _, H, O, H],
-    [H, H, H, H, H, H, H, H],
-];
+try {
+    const O = Cell.Hole;
+    const _ = Cell.Blank;
+    const H = Cell.Wall;
+    const X = Cell.Box;
 
-var XX = states.length;
-var YY = states[0].length;
+    const states = [
+        [H, H, H, H, H, H, H, H],
+        [H, _, _, _, _, _, _, H],
+        [H, _, _, _, _, X, H, H],
+        [H, _, _, _, _, H, _, H],
+        [H, _, _, _, _, H, O, H],
+        [H, H, H, H, H, H, H, H],
+    ];
 
-// Check cells state
-for (let x = 0; x < XX; x++) {
-    for (let y = 0; y < YY; y++) {
-        let pos = new Position(x, y);
-        let cell = states[x][y];
-        if (!cell.isValidState) throw `Invalid cell ${pos.toString()} state: ${cell.char}`
+    const XX = states.length;
+    const YY = states[0].length;
+
+    // Check cells state
+    for (let x = 0; x < XX; x++) {
+        for (let y = 0; y < YY; y++) {
+            const pos = new Position(x, y);
+            const cell = states[x][y];
+            if (!isValidState(cell)) throw `Invalid cell ${pos.toString()} state: ${cChar(cell)}`
+        }
     }
+
+    console.log('Testing .......');
+
+    const board = new Board(XX, YY);
+    board.initBoard(states, new Position(1, 1));
+    board.printBoard();
+
+    const pos = new Position(3, 7); // 3,7 false
+    console.log(`Can move: ${pos.toString()} - ${board.canMove(pos)}`);
 }
-
-var board = new Board(XX, YY);
-board.initBoard(states, new Position(1, 1));
-board.printBoard();
-
-var pos = new Position(3, 4);
-console.log(`Can move: ${pos.toString()} - ${board.canMove(pos)}`);
+catch (error) {
+    console.log('Error', error);
+    console.log('wait');
+}

@@ -1,12 +1,16 @@
-import Cell from './Cell';
-import { Left, Top, Right, Bottom } from './Direction';
+import Cell, { isValidState, char as cChar } from './Cell';
+import Direction from './Direction';
 import Position from './Position';
 
 export default class Board {
-
 	/**
 	 * Note: x = 0: top, y = 0: left
 	 */
+	X: number;
+	Y: number;
+	cells: Cell[][];
+	boxCount: number;
+	manPos: Position;
 
 	/**
 	 * 
@@ -19,9 +23,9 @@ export default class Board {
 		this.Y = Y;
 
 		// X: first index, Y: second index
-		this.cells = new Array(X);
-		for (var x = 0; x < X; x++) {
-			this.cells[x] = new Array(Y);
+		this.cells = [];
+		for (let x = 0; x < X; x++) {
+			this.cells[x] = [];
 		}
 	}
 
@@ -31,7 +35,7 @@ export default class Board {
 	 * @param {Cell} cell
 	 */
 	initCell(pos, cell) {
-		var { x, y } = pos;
+		const { x, y } = pos;
 		if (x >= this.X) throw `Invalid x value ${x}`;
 		if (y >= this.Y) throw `Invalid y value ${y}`;
 
@@ -46,7 +50,7 @@ export default class Board {
 		// 	if (this.cells[x][y].isBox) this.boxCount--;
 		// }
 
-		this.cells[x][y] = cell.copy();
+		this.cells[x][y] = cell;
 	}
 
 	/**
@@ -74,17 +78,18 @@ export default class Board {
 	 * @param {any} pos
 	 */
 	isInBoard(pos) {
-		var { x, y } = pos;
-		var { X, Y } = this;
+		const { x, y } = pos;
+		const { X, Y } = this;
 		return x >= 0 && x < X && y >= 0 && y < Y;
     }
 
 	/**
 	 * Validate board state
+	 * @returns {string} error string or null
 	 * */
 	validate() {
-		var boxCount = 0;
-		var holeCount = 0;
+		let boxCount = 0;
+		let holeCount = 0;
 		
 		// Man position is in the board
 		if (!this.isInBoard(this.manPos)) {
@@ -99,26 +104,26 @@ export default class Board {
 		// All cell is in valid state
 		for(let x=0; x<this.X; x++){
 			for(let y=0; y<this.Y; y++) {
-				let pos = new Position(x, y);
-				let cell = this.cells[x][y];
+				const pos = new Position(x, y);
+				const cell = this.cells[x][y];
 
 				// Not a valid state
-				if (!cell.isValidState) {
+				if (!isValidState(cell)) {
 					return `Cell [${pos.toString()}] state ${cell} is invalid`;
 				}
 
 				// Box count
-				if (cell.isBox) boxCount ++;
+				if (cell & Cell.Box) boxCount ++;
 
 				// Hole count
-				if (cell.isHole) holeCount++;
+				if (cell & Cell.Hole) holeCount++;
 			}
 		}
 		
 		// Box count = Hole count
 		if(boxCount !== holeCount) return `Box count (${boxCount}) != Hole count (${holeCount})`;
 
-		return false;
+		return null;
     }
 
 	/**
@@ -126,8 +131,8 @@ export default class Board {
 	 * @param {any} pos
 	 */
 	isEmpty(pos) {
-		var { x, y } = pos;
-		return this.cells[x][y].ObjNib === 0;
+		const { x, y } = pos;
+		return (this.cells[x][y] & Cell.ObjNibbles) === 0;
 	}
 
 	/**
@@ -142,8 +147,8 @@ export default class Board {
 	 * Check if two board are equal
 	 * @param {any} board2
 	 */
-	isEqual(board2) {
-		// TODO
+	isEqual(/*board2*/) {
+		throw 'Not implemented';
 		//return this.boxCount === board2.boxCount
 	}
 
@@ -156,7 +161,7 @@ export default class Board {
 			let row = '';
 			for (let y = 0; y < this.Y; y++) {
 				if (new Position(x, y).equal(this.manPos)) row += 'M';
-				else row += this.cells[x][y].char;
+				else row += cChar(this.cells[x][y]);
 			}
 			console.log(row);
         }
@@ -172,11 +177,11 @@ export default class Board {
 		if (this.manPos.equal(pos)) return true;
 
 		// Find all adjacent positions
-		var zone = [this.manPos];
+		const zone = [this.manPos];
 
 		// brute force algorithm
 		for (; ;) {
-			let { pos: nextPos/*, dir*/ } = this.findMove(zone) || {};
+			const { pos: nextPos/*, dir*/ } = this.findMove(zone) || {};
 
 			// Cannot find new pos
 			if (nextPos === undefined) return false;
@@ -201,17 +206,17 @@ export default class Board {
 	 * @returns {Position} next movable position
 	 */
 	findMove(zone) {
-		var dirs = [Left, Right, Top, Bottom];
+		const dirs = [Direction.Left, Direction.Right, Direction.Up, Direction.Down];
 
 		// For each cell in zone, check if adjacent cells can walk
 		for (let i = 0; i < zone.length; i++) {
-			let pos = zone[i];
+			const pos = zone[i];
 
 			// Loop on dirs
 			for (let j = 0; j < 4; j++) {
-				let dir = dirs[j];
+				const dir = dirs[j];
+				const newPos = pos.adjacent(dir);
 
-				let newPos = pos.adjacent(dir);
 				if (!this.isInBoard(newPos)) continue;
 
 				// Check if pos is walked
