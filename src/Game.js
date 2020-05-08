@@ -10,7 +10,7 @@ const X = new Cell(BoxFlag);
 var states = [
     [H, H, H, H, H, H, H, H],
     [H, _, _, _, _, _, _, H],
-    [H, _, _, _, _, X, _, H],
+    [H, _, _, _, _, X, H, H],
     [H, _, _, _, _, H, _, H],
     [H, _, _, _, _, H, O, H],
     [H, H, H, H, H, H, H, H],
@@ -32,5 +32,5 @@ var board = new Board(XX, YY);
 board.initBoard(states, new Position(1, 1));
 board.printBoard();
 
-var pos = new Position(2, 2);
+var pos = new Position(3, 4);
 console.log(`Can move: ${pos.toString()} - ${board.canMove(pos)}`);

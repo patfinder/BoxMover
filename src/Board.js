@@ -174,11 +174,14 @@ export default class Board {
 		// Find all adjacent positions
 		var zone = [this.manPos];
 
+		// brute force algorithm
 		for (; ;) {
-			let nextPos = this.findMove(zone);
+			let { pos: nextPos/*, dir*/ } = this.findMove(zone) || {};
 
 			// Cannot find new pos
 			if (nextPos === undefined) return false;
+
+			// console.log(`Dir: ${dir.char}`);
 
 			// Expand zone to newPos, continue searching
 			zone.push(nextPos);
@@ -213,7 +216,7 @@ export default class Board {
 
 				// Check if pos is walked
 				if (this.isEmpty(newPos) && zone.every(p => !newPos.equal(p))) {
-					return newPos;
+					return { pos: newPos, dir };
 				}
 			}
         }
