@@ -1,16 +1,16 @@
 
 // Low nibble
-const Blank = 0x01;
-const Hole  = 0x02;
+export const BlankFlag = 0x01;
+export const HoleFlag  = 0x02;
 // High nible
-const Wall  = 0x10;
-const Box   = 0x20;
+export const WallFlag  = 0x10;
+export const BoxFlag   = 0x20;
 // Man:   0x40,
 
 // Get Blank or Hole part
-const BaseNib = 0x0F;
+const BaseNibFlags = 0x0F;
 // Get Wall, Box, Man part
-const ObjNib  = 0xF0;
+const ObjNibFlags  = 0xF0;
 
 export default class Cell {
 
@@ -22,32 +22,49 @@ export default class Cell {
         return new Cell(cell.value);
     }
 
+    get isBlank() { return Boolean(this.value & BlankFlag); }
+    get isHole() { return Boolean(this.value & HoleFlag); }
+    get isWall() { return Boolean(this.value & WallFlag); }
+    get isBox() { return Boolean(this.value & BoxFlag); }
+
+    char0x() {
+        return this.value.toString(16);
+    }
+
     /**
      * Get representing char of cell state
      * @param {Cell} value
      */
-    cellChar() {
+    toChar() {
         var value = this.value;
 
-        if (value & Cell.Wall)  return 'H';
-        if (value & Cell.Box)   return 'X';
-        if (value & Cell.Box && value & Cell.Hole) {
-            return '0';
+        //if (value & WallFlag)  return 'H';
+        if (value & WallFlag) return String.fromCharCode(219);
+        if (value & BoxFlag) return 'X';
+        // Occupied Hole
+        if (value & BoxFlag && value & HoleFlag) {
+            return '#';
         }
-        if (value & Cell.Hole)  return 'O';
-        if (value & Cell.Blank) return ' ';
+        if (value & HoleFlag) return 'O';
+        if (value & BlankFlag) return ' ';
 
         // TODO: what about Man & Hole ?
         return undefined;
     }
 
-    // Low nibble
-    static get Blank() { return Blank; }
-    static get Hole() { return Hole; }
-    // High nible
-    static get Wall() { return Wall; }
-    static get Box() { return Box; }
+    get isValidState() {
+        var value = this.value;
 
-    static get BaseNib() { return BaseNib; }
-    static get ObjNib() { return ObjNib; }
+        var base = value & BaseNibFlags;
+        var obj = value & ObjNibFlags;
+
+        if (obj !== BlankFlag && obj !== HoleFlag) return false;
+
+        if (base !== WallFlag && base !== BoxFlag) return false;
+
+        return true;
+    }
+
+    get BaseNib() { return this.value & BaseNibFlags; }
+    get ObjNib() {  return this.value & ObjNibFlags; }
 }

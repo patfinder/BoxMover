@@ -1,11 +1,11 @@
-import Cell from './CellState';
+import Cell, { BlankFlag, HoleFlag, WallFlag, BoxFlag } from './Cell';
 import Board from './Board';
 import Position from './Position';
 
-const O = Cell.Hole;
-const _ = Cell.Blank;
-const H = Cell.Wall;
-const X = Cell.Box;
+const O = HoleFlag;
+const _ = BlankFlag;
+const H = WallFlag;
+const X = BoxFlag;
 
 var states = [
     [H, H, H, H, H, H, H, H],
@@ -25,4 +25,4 @@ board.printBoard();
 
 var pos = new Position(2, 2);
 var posStr = JSON.stringify(pos);
-console.log(`Can move: ${posStr} - ${board.canMove(pos)}`);
+console.log(`Can move: ${pos.toString()} - ${board.canMove(pos)}`);

@@ -1,30 +1,6 @@
-import Cell from './CellState';
+import Cell from './Cell';
 import Direction from './Direction';
 import Position from './Position';
-
-/**
- * Get representing char of cell state
- * @param {Cell} cell
- */
-export function cellChar(cell) {
-	if (cell & Cell.Wall)  return 'H';
-	if (cell & Cell.Box)   return 'X';
-	if (cell & Cell.Hole)  return 'O';
-    if (cell & Cell.Blank) return ' ';
-
-	return undefined;
-}
-
-export function isValidState(cell){
-	var base = cell & Cell.BaseNib;
-	var obj = cell & Cell.ObjNib;
-
-	if(obj !== Cell.Blank && obj !== Cell.Hole) return false;
-	
-	if(base !== Cell.Wall && base !== Cell.Box) return false;
-
-	return true;
-}
 
 export default class Board {
 
@@ -62,12 +38,12 @@ export default class Board {
 		// TODO: check state value
 
 		// Set box
-		if (state & Cell.Box) {
-			if ((this.cells[x][y] & Cell.Box) === 0) this.boxCount++;
+		if (state.isBox) {
+			if ((this.cells[x][y].isBox) === 0) this.boxCount++;
 		}
 		else {
 			// Clear box
-			if (this.cells[x][y] & Cell.Box) this.boxCount--;
+			if (this.cells[x][y].isBox) this.boxCount--;
 		}
 
 		this.cells[x][y] = state;
@@ -124,18 +100,18 @@ export default class Board {
 		for(let x=0; x<this.X; x++){
 			for(let y=0; y<this.Y; y++) {
 				let pos = new Position(x, y);
-				let state = this.cells[x][y];
+				let cell = this.cells[x][y];
 
 				// Not a valid state
-				if(!isValidState(state)) {
-					return `Cell [${pos.toString()}] state ${state} is invalid`;
+				if (!cell.isValidState) {
+					return `Cell [${pos.toString()}] state ${cell} is invalid`;
 				}
 
 				// Box count
-				if(state & Cell.Box) boxCount ++;
+				if (cell.isBox) boxCount ++;
 
 				// Hole count
-				if(state & Cell.Hole) holeCount++;
+				if (cell.isHole) holeCount++;
 			}
 		}
 		
@@ -200,7 +176,7 @@ export default class Board {
 			let row = '';
 			for (let y = 0; y < this.Y; y++) {
 				if (new Position(x, y).equal(this.manPos)) row += 'M';
-				else row += cellChar(this.cells[x][y]);
+				else row += this.cells[x][y].toChar();
 			}
 			console.log(row);
         }
