@@ -1,50 +1,79 @@
 import Direction, { char as dChar } from "./Direction";
 
-export function id(pos: Position) {
-	return `${pos.x}-${pos.y}`
+export function id(pos: Point): string {
+    return `${pos.x}-${pos.y}`
 }
 
-export function idFromXY(x: number, y: number) {
-	return `${x}-${y}`
+export function idFromXY(x: number, y: number): string {
+    return `${x}-${y}`
 }
 
-export default class Position {
-	x: number;
-	y: number;
+export function parseId(id: string): string[] {
+    if (!id) return [];
+    return id.split('-');
+}
 
-	constructor(x, y) {
-		this.x = x;
-		this.y = y;
-	}
+export default class Point {
+    x: number;
+    y: number;
 
-	toString(){
-		return `{${this.x}, ${this.y}}`;
-	}
-
-	get id() {
-		return id(this);
+    constructor(x: number, y: number) {
+        this.x = x;
+        this.y = y;
     }
 
-	equal(pos) {
-		return pos.x === this.x && pos.y === this.y;
-	}
+    toString() {
+        return `{${this.x}, ${this.y}}`;
+    }
+
+    get id() {
+        return id(this);
+    }
+
+    get left() {
+        const { x, y } = this;
+
+        if (y <= 0) return undefined;
+
+        return new Point(x, y - 1);
+    }
+
+    get right() {
+        const { x, y } = this;
+        return new Point(x, y + 1);
+    }
+
+    get top() {
+        const { x, y } = this;
+
+        if (x <= 0) return undefined;
+
+        return new Point(x - 1, y);
+    }
+
+    get bottom() {
+        const { x, y } = this;
+        return new Point(x + 1, y);
+    }
+
+    equal = (pos: Point) => pos.x === this.x && pos.y === this.y;
 
 	/**
 	 * Get next pos of specified pos
 	 * @param {Direction} dir move direction
 	 */
-	adjacent(dir: Direction) {
-		const { x, y } = this;
-		let dx = 0, dy = 0;
+    adjacent(dir: Direction) {
+        const { x, y } = this;
+        let dx = 0, dy = 0;
 
-		if (dir === Direction.Left || dir === Direction.Right) {
-			dx = dir === Direction.Left ? -1 : 1;
-		}
-		else if (dir === Direction.Up || dir === Direction.Down) {
-			dy = dir === Direction.Up ? -1 : 1;
-		}
-		else throw `Invalid dir ${dChar(dir)}`;
+        if (dir === Direction.Left || dir === Direction.Right) {
+            dx = dir === Direction.Left ? -1 : 1;
+        }
+        else if (dir === Direction.Up || dir === Direction.Down) {
+            dy = dir === Direction.Up ? -1 : 1;
+        }
+        else throw `Invalid dir ${dChar(dir)}`;
 
-		return new Position(x + dx, y + dy);
-	}
+        return new Point(x + dx, y + dy);
+    }
 }

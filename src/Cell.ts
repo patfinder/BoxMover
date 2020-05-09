@@ -21,7 +21,7 @@ export function char0x(cell) {
  * Get representing char of cell state
  * @param {Cell} value
  */
-export function char(cell) {
+export function char(cell: Cell) {
     const value = cell;
 
     if (value & Cell.Wall) return 'H';
@@ -38,7 +38,7 @@ export function char(cell) {
     return undefined;
 }
 
-export function isValidState(cell) {
+export function isValidState(cell: Cell) {
 
     // Not Blank & Hole at the same time
     if (cell & Cell.Blank && cell & Cell.Hole) return false;
