@@ -1,6 +1,9 @@
 import Cell, { isValidState, char as cChar } from './Cell';
 import Direction from './Direction';
-import Position from './Position';
+import Position, { idFromXY } from './Position';
+import createGraph, { Graph } from 'ngraph.graph';
+import * as pathLib from 'ngraph.path';
+import { PathFinder } from 'ngraph.path';
 
 export default class Board {
 	/**
@@ -11,6 +14,8 @@ export default class Board {
 	cells: Cell[][];
 	boxCount: number;
 	manPos: Position;
+	graph: Graph;
+	pathFinder: PathFinder<number>;
 
 	/**
 	 * 
@@ -18,7 +23,7 @@ export default class Board {
 	 * @param {any} Y
 	 * @param {Position} manPos Man's initial position
 	 */
-	constructor(X, Y) {
+	constructor(X: number, Y: number) {
 		this.X = X;
 		this.Y = Y;
 
@@ -34,7 +39,7 @@ export default class Board {
 	 * @param {Position} pos cell position
 	 * @param {Cell} cell
 	 */
-	initCell(pos, cell) {
+	initCell(pos: Position, cell: Cell) {
 		const { x, y } = pos;
 		if (x >= this.X) throw `Invalid x value ${x}`;
 		if (y >= this.Y) throw `Invalid y value ${y}`;
@@ -57,7 +62,7 @@ export default class Board {
 	 * Initialize board
 	 * @param {Cell[x][y]} board of cell states
 	 */
-	initBoard(board, manPos) {
+	initBoard(board: Board, manPos: Position) {
 
 		// box count
 		this.boxCount = 0;
@@ -73,11 +78,60 @@ export default class Board {
 		this.manPos = new Position(manPos.x, manPos.y);
 	}
 
+	createGraph() {
+		this.graph = createGraph();
+		this.pathFinder = pathLib.aStar(this.graph, {
+			// We tell our pathfinder what should it use as a distance function:
+			distance(_fromNode, _toNode, link) {
+				// We don't really care about from/to nodes in this case,
+				// as link.data has all needed information:
+				return link.data.weight;
+			}
+		});
+
+		const graph = this.graph;
+
+		// Create nodes
+		for (let x = 0; x < this.X; x++) {
+			// Y-1 cols
+			for (let y = 0; y < this.Y - 1; y++) {
+
+				const cell = this.cells[x][y];
+
+				// This is Wall
+				if (cell & Cell.Wall) continue;
+
+				// Node: None wall cell
+				const thisId = idFromXY(x, y);
+				const rightId = idFromXY(x, y + 1);
+				const bottomId = idFromXY(x + 1, y);
+
+				graph.addNode(thisId);
+
+				// Node is Box
+				if (cell & Cell.Box) continue;
+
+				// Right is empty
+				if (this.cells[x][y + 1] & Cell.ObjNibbles) {
+					graph.addLink(thisId, rightId);
+				}
+
+				// Last row
+				if (x === this.X - 1) continue;
+
+				// Bottom is empty
+				if (this.cells[x + 1][y] & Cell.ObjNibbles) {
+					graph.addLink(thisId, bottomId);
+				}
+			}
+		}
+    }
+
 	/**
 	 * Check if a pos is in board
 	 * @param {any} pos
 	 */
-	isInBoard(pos) {
+	isInBoard(pos: Position) {
 		const { x, y } = pos;
 		const { X, Y } = this;
 		return x >= 0 && x < X && y >= 0 && y < Y;
@@ -127,10 +181,10 @@ export default class Board {
     }
 
 	/**
-	 * Check if a cell is empty (Blank or Hole)
+	 * Check if a cell is empty (no Box or Wall)
 	 * @param {any} pos
 	 */
-	isEmpty(pos) {
+	isEmpty(pos: Position) {
 		const { x, y } = pos;
 		return (this.cells[x][y] & Cell.ObjNibbles) === 0;
 	}
@@ -139,7 +193,7 @@ export default class Board {
 	 * This pos is occupied (Wall or Block)
 	 * @param {any} pos
 	 */
-	isOccupied(pos) {
+	isOccupied(pos: Position) {
 		return !this.isEmpty(pos);
     }
 
@@ -148,12 +202,12 @@ export default class Board {
 	 * @param {any} board2
 	 */
 	isEqual(/*board2*/) {
+		// TODO: isEqual
 		throw 'Not implemented';
 		//return this.boxCount === board2.boxCount
 	}
 
 	printBoard() {
-
 		console.log(`X: ${this.X}, Y: ${this.Y} - valid: ${this.validate()}`);
 		console.log(`Man: ${this.manPos.x}, ${this.manPos.y}`);
 
@@ -207,7 +261,7 @@ export default class Board {
 	 * @param {[Position]} zone current cells in the zone
 	 * @returns {Position} next movable position
 	 */
-	findMove(zone) {
+	findMove(zone: Position[]) {
 		const dirs = [Direction.Left, Direction.Right, Direction.Up, Direction.Down];
 
 		// For each cell in zone, check if adjacent cells can walk
@@ -233,7 +287,8 @@ export default class Board {
 	 * Find Man shortest path to specified pos
 	 * @param pos target pos
 	 */
-	shortestPath(pos: Position) {
-
+	getPath(pos: Position) {
+		const manId = `${this.manPos.x}`
+		this.pathFinder.find()
 	}
 }

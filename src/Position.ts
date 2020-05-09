@@ -1,5 +1,13 @@
 import Direction, { char as dChar } from "./Direction";
 
+export function id(pos: Position) {
+	return `${pos.x}-${pos.y}`
+}
+
+export function idFromXY(x: number, y: number) {
+	return `${x}-${y}`
+}
+
 export default class Position {
 	x: number;
 	y: number;
@@ -9,12 +17,16 @@ export default class Position {
 		this.y = y;
 	}
 
-	equal(pos) {
-		return pos.x === this.x && pos.y === this.y;
-	}
-
 	toString(){
 		return `{${this.x}, ${this.y}}`;
+	}
+
+	get id() {
+		return id(this);
+    }
+
+	equal(pos) {
+		return pos.x === this.x && pos.y === this.y;
 	}
 
 	/**
@@ -35,26 +47,4 @@ export default class Position {
 
 		return new Position(x + dx, y + dy);
 	}
-
-	/**
-	 * Get x distance to target pos.
-	 * @param x
-	 * @returns positive value if target is on the right side of this point
-	 */
-	distanceX(x: number) {
-		return x - this.x;
-	}
-
-	/**
-	 * Get y distance to target pos.
-	 * @param y
-	 * @returns positive value if target is on the bottom side of this point
-	 */
-	distanceY(y: number) {
-		return y - this.y;
-	}
-
-	toMove(pos: Position) {
-
-    }
 }
