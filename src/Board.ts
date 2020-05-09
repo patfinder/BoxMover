@@ -36,30 +36,6 @@ export default class Board {
     }
 
 	/**
-	 * Initialize cell value
-	 * @param {Point} pos cell position
-	 * @param {Cell} cell
-	 */
-    initCell(pos: Point, cell: Cell) {
-        const { x, y } = pos;
-        if (x >= this.X) throw `Invalid x value ${x}`;
-        if (y >= this.Y) throw `Invalid y value ${y}`;
-
-        // TODO: check state value
-
-        // Set box
-        // if (cell.isBox) {
-        // 	if ((this.cells[x][y].isBox) === 0) this.boxCount++;
-        // }
-        // else {
-        // 	// Clear box
-        // 	if (this.cells[x][y].isBox) this.boxCount--;
-        // }
-
-        this.cells[x][y] = cell;
-    }
-
-	/**
 	 * Initialize board
 	 * @param {Cell[x][y]} board of cell states
 	 */
@@ -68,10 +44,10 @@ export default class Board {
         // box count
         this.boxCount = 0;
 
-        // cells
+        // Init cells
         for (let x = 0; x < this.X; x++) {
             for (let y = 0; y < this.Y; y++) {
-                this.initCell(new Point(x, y), board[x][y]);
+                this.cells[x][y] = board[x][y];
             }
         }
 
@@ -251,31 +227,7 @@ export default class Board {
 	 * @param {pos} pos
 	 */
     canMove(pos: Point) {
-        // No move
-        if (this.manPos.equal(pos)) return true;
-
-        // Find all adjacent positions
-        const zone = [this.manPos];
-
-        // brute force algorithm
-        for (; ;) {
-            const { pos: nextPos/*, dir*/ } = this.findMove(zone) || {};
-
-            // Cannot find new pos
-            if (nextPos === undefined) return false;
-
-            // console.log(`Dir: ${dir.char}`);
-
-            // Expand zone to newPos, continue searching
-            zone.push(nextPos);
-
-            // Reach the pos
-            if (nextPos.equal(pos)) {
-                return true;
-            }
-
-            console.log(`Zone: ${zone.map(p => p.toString()).join(', ')}`);
-        }
+        
     }
 
 	/**
