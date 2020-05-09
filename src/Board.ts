@@ -59,7 +59,11 @@ export default class Board {
 
     createGraph() {
         this.graph = (graphLib as any)();
-        this.pathFinder = pathLib.aStar(this.graph);
+        this.pathFinder = pathLib.aStar(this.graph, {
+            //distance: (_from, _to, link) => {
+            //    return link.data.weight;
+            //},
+        });
 
         const graph = this.graph;
 
@@ -164,7 +168,7 @@ export default class Board {
     }
 
 	/**
-	 * This pos is occupied (Wall or Block)
+	 * This pos is occupied (by Wall or Block)
 	 * @param {any} pos
 	 */
     isOccupied(pos: Point) {
@@ -235,7 +239,7 @@ export default class Board {
 	 * @param {[Point]} zone current cells in the zone
 	 * @returns {Point} next movable position
 	 */
-    findMove(zone: Point[]) {
+    findMove__(zone: Point[]) {
         const dirs = [Direction.Left, Direction.Right, Direction.Up, Direction.Down];
 
         // For each cell in zone, check if adjacent cells can walk

@@ -8,13 +8,25 @@ This tool help solving Block moving game
 
 ## Sophisticated solver
 
-### Blocking
-- Box is at a corner (blocked at 2 directions)
+### State Score
+- Scoring a State so that state with higher Score means closer to Goal
+- State with Blocked Box (see below) have Absolute Negative Score
+- State caused by a Must Move have Absolute Positive Score
+
+### Blocked Box
+- Box is at a corner (blocked permanently at 2 both H(orizontal) & V(ertical) directions)
 - Box can only move along a line and there is not a possible Hole for that Box
-- ?? Box that 
+- A Box can be blocked temporarily when it is blocked by another block which can be moved
+	This Box is not a Blocked Box
 
-### Bad Push
+### Reached Box
+- Box that is located on a Hole
 
-- Dead Box: a Box that can't reach any Hole
-	* Box that can only 
-A Push that make a Box dead
+### Dead Move
+- Is a Move that create a Blocked Box
+
+### Must Move
+- A Move that cause a Temporarily blocked Box to become Free
+
+### Heuristic Move
+- A Move that make a Box closer to a Hole
