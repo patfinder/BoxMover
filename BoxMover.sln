@@ -5,6 +5,27 @@ VisualStudioVersion = 16.0.30011.22
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "BoxMover", "BoxMover.njsproj", "{C9A50B0C-DC41-4FF5-B471-8F2EA9B70FB9}"
 EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "ngraph", "..\..\Study\ngraph\", "{44D48CF4-D1FC-43E9-9526-0548825BFB83}"
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_60121"
+		Debug.AspNetCompiler.PhysicalPath = "..\..\Study\ngraph\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_60121\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_60121"
+		Release.AspNetCompiler.PhysicalPath = "..\..\Study\ngraph\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_60121\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "60121"
+		SlnRelativePath = "..\..\Study\ngraph\"
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +36,10 @@ Global
 		{C9A50B0C-DC41-4FF5-B471-8F2EA9B70FB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C9A50B0C-DC41-4FF5-B471-8F2EA9B70FB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C9A50B0C-DC41-4FF5-B471-8F2EA9B70FB9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{44D48CF4-D1FC-43E9-9526-0548825BFB83}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44D48CF4-D1FC-43E9-9526-0548825BFB83}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44D48CF4-D1FC-43E9-9526-0548825BFB83}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{44D48CF4-D1FC-43E9-9526-0548825BFB83}.Release|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -4,7 +4,8 @@
 
 import Cell, { isValidState, char as cChar } from './Cell';
 import Board from './Board';
-import Point from './Position';
+import Point from './Point';
+import Solver from './Solver';
 
 try {
     const O = Cell.Hole;
@@ -35,12 +36,17 @@ try {
         }
     }
 
+    // Board
     const board = new Board(XX, YY);
     board.initBoard(states, new Point(4, 1));
     board.printBoard();
 
+    // Solver
+    const solver = new Solver();
+    solver.createGraph(board);
+
     const pos = new Point(3, 5); // 3,7 false
-    const path = board.getPath(pos);
+    const path = board.getPath(solver.pathFinder, pos);
     //const pathStr = path.map(n => n.id).join(' <- ');
     //console.log(`Path: ${pos.toString()} - ${pathStr}`);
     board.printBoardWithPath(path);

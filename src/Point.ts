@@ -22,15 +22,17 @@ export default class Point {
         this.y = y;
     }
 
-    toString() {
+    toString(): string {
         return `{${this.x}, ${this.y}}`;
     }
 
-    get id() {
+    get str() { return this.toString(); }
+
+    get id(): string {
         return id(this);
     }
 
-    get left() {
+    get left(): Point {
         const { x, y } = this;
 
         if (y <= 0) return undefined;
@@ -38,12 +40,12 @@ export default class Point {
         return new Point(x, y - 1);
     }
 
-    get right() {
+    get right(): Point {
         const { x, y } = this;
         return new Point(x, y + 1);
     }
 
-    get top() {
+    get top(): Point {
         const { x, y } = this;
 
         if (x <= 0) return undefined;
@@ -51,10 +53,15 @@ export default class Point {
         return new Point(x - 1, y);
     }
 
-    get bottom() {
+    get bottom(): Point {
         const { x, y } = this;
         return new Point(x + 1, y);
     }
+
+    /*
+     * Get near-by Points with order: Left, Right, Top, Bottom
+     */
+    nearBys = () => [this.left, this.right, this.top, this.bottom];
 
     equal = (pos: Point) => pos.x === this.x && pos.y === this.y;
 
@@ -62,7 +69,7 @@ export default class Point {
 	 * Get next pos of specified pos
 	 * @param {Direction} dir move direction
 	 */
-    adjacent(dir: Direction) {
+    adjacent(dir: Direction): Point {
         const { x, y } = this;
         let dx = 0, dy = 0;
 

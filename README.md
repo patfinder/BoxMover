@@ -13,20 +13,38 @@ This tool help solving Block moving game
 - State with Blocked Box (see below) have Absolute Negative Score
 - State caused by a Must Move have Absolute Positive Score
 
-### Blocked Box
+### Near-By (NB)
+- Near-By: 4 Cells around specified Box
+
+### Blocked Box (BB)
 - Box is at a corner (blocked permanently at 2 both H(orizontal) & V(ertical) directions)
 - Box can only move along a line and there is not a possible Hole for that Box
+- Box that only possible Move is to becoming BB (as above cases)
 - A Box can be blocked temporarily when it is blocked by another block which can be moved
 	This Box is not a Blocked Box
 
-### Reached Box
+### Temporarily Blocked Box (TBB)
+- Temporarily BB is a Box that can't be moved for now 
+	but if a nearby Box move, it can move too
+
+### Reached Box (RB)
 - Box that is located on a Hole
 
-### Dead Move
-- Is a Move that create a Blocked Box
+### Dead Move (DM)
+- Is a Move that make that Box or Near-By Box become BB
 
-### Must Move
+### Must Move (MM)
 - A Move that cause a Temporarily blocked Box to become Free
 
 ### Heuristic Move
 - A Move that make a Box closer to a Hole
+
+
+### Implementation
+
+- Global graph (then no recreating whole graph after each move)
+- Graph is member of so call Algorithm object
+	So we can access some closure's variable for distance calculation
+- 
+
+

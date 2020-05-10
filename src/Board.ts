@@ -1,10 +1,10 @@
+import * as graphLib from 'ngraph.graph';
+import * as pathLib from 'ngraph.path';
+
 import Cell, { isValidState, char as cChar } from './Cell';
 import Direction from './Direction';
-import Point, { parseId } from './Position';
-import * as graphLib from 'ngraph.graph';
-import { Graph } from 'ngraph.graph';
-import * as pathLib from 'ngraph.path';
-import { PathFinder } from 'ngraph.path';
+import Point, { parseId } from './Point';
+import { CNodeData } from './Solver';
 
 export default class Board {
 	/**
@@ -15,8 +15,6 @@ export default class Board {
     cells: Cell[][];
     boxCount: number;
     manPos: Point;
-    graph: graphLib.Graph;
-    pathFinder: PathFinder<number>;
 
 	/**
 	 * 
@@ -54,50 +52,7 @@ export default class Board {
         // man pos
         this.manPos = new Point(manPos.x, manPos.y);
 
-        this.createGraph();
-    }
-
-    createGraph() {
-        this.graph = (graphLib as any)();
-        this.pathFinder = pathLib.aStar(this.graph, {
-            //distance: (_from, _to, link) => {
-            //    return link.data.weight;
-            //},
-        });
-
-        const graph = this.graph;
-
-        // Create nodes
-        for (let x = 0; x < this.X; x++) {
-            // Y-1 cols
-            for (let y = 0; y < this.Y - 1; y++) {
-
-                const node = new Point(x, y);
-                const right = node.right;
-                const bottom = node.bottom;
-
-                // This is Wall
-                if (this.isWall(node)) continue;
-
-                graph.addNode(node.id);
-
-                // Node is Box
-                if (this.isBox(node)) continue;
-
-                // Right is empty
-                if (this.isEmpty(right)) {
-                    graph.addLink(node.id, right.id);
-                }
-
-                // Last row, no bottom
-                if (x === this.X - 1) continue;
-
-                // Bottom is empty
-                if (this.isEmpty(bottom)) {
-                    graph.addLink(node.id, bottom.id);
-                }
-            }
-        }
+        //this.createGraph(); // TODO
     }
 
 	/**
@@ -189,6 +144,28 @@ export default class Board {
         return Boolean(this.cells[x][y] & Cell.Box);
     }
 
+    /**
+     * 
+     * @param pos
+     */
+    canMoveHPerma(pos: Point): boolean {
+        
+    }
+
+    canMoveVPerma(pos: Point): boolean {
+
+    }
+
+    /**
+     * Box at specified Box can only move on one Direction (H or V)
+     * @param pos Position of the Box
+     */
+    onlyMoveOneDirection(pos): Direction {
+        if (!this.isBox(pos)) throw `Current pos${pos.str} must be a Box`;
+
+        d
+    }
+
 	/**
 	 * Check if two board are equal
 	 * @param {any} board2
@@ -226,15 +203,6 @@ export default class Board {
     }
 
 	/**
-	 * Check if Man can move to specified position.
-	 * True if there is a path between Man's pos and the position.
-	 * @param {pos} pos
-	 */
-    canMove(pos: Point) {
-        
-    }
-
-	/**
 	 * Find a cell adjacent to cells that can move
 	 * @param {[Point]} zone current cells in the zone
 	 * @returns {Point} next movable position
@@ -265,8 +233,8 @@ export default class Board {
 	 * Find Man shortest path to specified pos
 	 * @param pos target pos
 	 */
-    getPath(pos: Point) {
-        return this.pathFinder.find(this.manPos.id, pos.id);
+    getPath(pathFinder: pathLib.PathFinder<CNodeData>, pos: Point): graphLib.Node<CNodeData>[] {
+        return pathFinder.find(this.manPos.id, pos.id);
     }
 
     printBoardWithPath(path: graphLib.Node[]) {

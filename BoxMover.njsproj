@@ -53,10 +53,12 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="src\Board.ts" />
+    <TypeScriptCompile Include="src\Solver.ts" />
+    <TypeScriptCompile Include="src\NodeState.ts" />
     <TypeScriptCompile Include="src\Cell.ts" />
     <TypeScriptCompile Include="src\Direction.ts" />
     <TypeScriptCompile Include="src\Game.ts" />
-    <TypeScriptCompile Include="src\Position.ts" />
+    <TypeScriptCompile Include="src\Point.ts" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsToolsV2.targets" />
   <ProjectExtensions>
