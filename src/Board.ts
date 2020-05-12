@@ -5,13 +5,29 @@ import Cell, { isValidState, char as cChar } from './Cell';
 import Direction from './Direction';
 import Point, { parseId } from './Point';
 import { CNodeData } from './Solver';
+import { pad } from './utils';
 
+/**
+ * Note: y: row index, top to bottom
+ *       x: column index, left to right
+ *       -------------> X
+ *       |
+ *       |
+ *       |
+ *       |
+ *       Y
+ */
 export default class Board {
-	/**
-	 * Note: x = 0: top, y = 0: left
-	 */
+
+    /*
+     * Row index
+     */
     X: number;
+    /*
+     * Row index
+     */
     Y: number;
+    // x first index, y second index
     cells: Cell[][];
     boxCount: number;
     manPos: Point;
@@ -26,10 +42,10 @@ export default class Board {
         this.X = X;
         this.Y = Y;
 
-        // X: first index, Y: second index
+        // Y: first index (rows), X: second index (columns)
         this.cells = [];
-        for (let x = 0; x < X; x++) {
-            this.cells[x] = [];
+        for (let y = 0; y < Y; y++) {
+            this.cells[y] = [];
         }
     }
 
@@ -43,16 +59,14 @@ export default class Board {
         this.boxCount = 0;
 
         // Init cells
-        for (let x = 0; x < this.X; x++) {
-            for (let y = 0; y < this.Y; y++) {
-                this.cells[x][y] = board[x][y];
+        for (let y = 0; y < this.Y; y++) {
+            for (let x = 0; x < this.X; x++) {
+                this.cells[y][x] = board[y][x];
             }
         }
 
         // man pos
         this.manPos = new Point(manPos.x, manPos.y);
-
-        //this.createGraph(); // TODO
     }
 
 	/**
@@ -84,10 +98,10 @@ export default class Board {
         }
 
         // All cell is in valid state
-        for (let x = 0; x < this.X; x++) {
-            for (let y = 0; y < this.Y; y++) {
+        for (let y = 0; y < this.Y; y++) {
+            for (let x = 0; x < this.X; x++) {
                 const pos = new Point(x, y);
-                const cell = this.cells[x][y];
+                const cell = this.cells[y][x];
 
                 // Not a valid state
                 if (!isValidState(cell)) {
@@ -114,12 +128,12 @@ export default class Board {
 	 */
     isEmpty(pos: Point) {
         const { x, y } = pos;
-        return (this.cells[x][y] & Cell.ObjNibbles) === 0;
+        return (this.cells[y][x] & Cell.ObjNibbles) === 0;
     }
 
     isHole(pos: Point) {
         const { x, y } = pos;
-        return Boolean(this.cells[x][y] & Cell.Hole);
+        return Boolean(this.cells[y][x] & Cell.Hole);
     }
 
 	/**
@@ -136,24 +150,30 @@ export default class Board {
 	 */
     isWall(pos: Point) {
         const { x, y } = pos;
-        return Boolean(this.cells[x][y] & Cell.Wall);
+        return Boolean(this.cells[y][x] & Cell.Wall);
     }
 
     isBox(pos: Point) {
         const { x, y } = pos;
-        return Boolean(this.cells[x][y] & Cell.Box);
+        return Boolean(this.cells[y][x] & Cell.Box);
     }
 
-    /**
-     * 
-     * @param pos
-     */
-    canMoveHPerma(pos: Point): boolean {
-        
+    hasWallOnX(pos: Point): boolean {
+        return this.isWall(pos.left) || this.isWall(pos.right);
     }
 
-    canMoveVPerma(pos: Point): boolean {
+    hasWallOnY(pos: Point): boolean {
+        return this.isWall(pos.top) || this.isWall(pos.bottom);
+    }
 
+    needThemMoveToMove(me: Point, them: Point) {
+        // They are on X
+        if ((them.equal(me.left) || them.equal(me.right)) && this.hasWallOnY(me)) return true;
+
+        // They are on Y
+        if ((them.equal(me.top) || them.equal(me.bottom)) && this.hasWallOnX(me)) return true;
+
+        return false;
     }
 
     /**
@@ -163,8 +183,22 @@ export default class Board {
     onlyMoveOneDirection(pos): Direction {
         if (!this.isBox(pos)) throw `Current pos${pos.str} must be a Box`;
 
-        d
+        // TODO: 
+        throw 'Not implemented'
     }
+
+    isBlockedBox(me: Point) {
+        if (!this.isBox(me)) return false; 
+
+        const nearBys = [me.left, me.right, me.top, me.bottom];
+
+        return nearBys.some(near => this.needThemMoveToMove(me, near) && this.needThemMoveToMove(near, me));
+    }
+
+    /*
+     * This Box has reached Goal.
+     */
+    reachGoal = (me: Point) => this.isBox(me) && this.isHole(me);
 
 	/**
 	 * Check if two board are equal
@@ -180,13 +214,15 @@ export default class Board {
         console.log(`X: ${this.X}, Y: ${this.Y} - valid: ${this.validate()}`);
         console.log(`Man: ${this.manPos.x}, ${this.manPos.y}`);
 
-        // Print columns
-        const cols = [...Array(this.Y).keys()].join('');
-        console.log(` ${cols}`);
-        for (let x = 0; x < this.X; x++) {
-            // Print rows
-            let row = `${x}`;
-            for (let y = 0; y < this.Y; y++) {
+        // Print X axis
+        const xAxis = [...Array(this.X).keys()].join('');
+        console.log(`   ${xAxis}`);
+
+        for (let y = 0; y < this.Y; y++) {
+            // Y axis ranks
+            let row = `${pad(y, 2)} `;
+
+            for (let x = 0; x < this.X; x++) {
                 const pos = new Point(x, y);
 
                 // On path
@@ -195,37 +231,11 @@ export default class Board {
                     continue;
                 }
 
+                // Man
                 if (pos.equal(this.manPos)) row += 'M';
-                else row += cChar(this.cells[x][y]);
+                else row += cChar(this.cells[y][x]);
             }
             console.log(row);
-        }
-    }
-
-	/**
-	 * Find a cell adjacent to cells that can move
-	 * @param {[Point]} zone current cells in the zone
-	 * @returns {Point} next movable position
-	 */
-    findMove__(zone: Point[]) {
-        const dirs = [Direction.Left, Direction.Right, Direction.Up, Direction.Down];
-
-        // For each cell in zone, check if adjacent cells can walk
-        for (let i = 0; i < zone.length; i++) {
-            const pos = zone[i];
-
-            // Loop on dirs
-            for (let j = 0; j < 4; j++) {
-                const dir = dirs[j];
-                const newPos = pos.adjacent(dir);
-
-                if (!this.isInBoard(newPos)) continue;
-
-                // Check if pos is walked
-                if (this.isEmpty(newPos) && zone.every(p => !newPos.equal(p))) {
-                    return { pos: newPos, dir };
-                }
-            }
         }
     }
 
@@ -233,7 +243,7 @@ export default class Board {
 	 * Find Man shortest path to specified pos
 	 * @param pos target pos
 	 */
-    getPath(pathFinder: pathLib.PathFinder<CNodeData>, pos: Point): graphLib.Node<CNodeData>[] {
+    walkTo(pathFinder: pathLib.PathFinder<CNodeData>, pos: Point): graphLib.Node<CNodeData>[] {
         return pathFinder.find(this.manPos.id, pos.id);
     }
 

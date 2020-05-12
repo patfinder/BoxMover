@@ -2,8 +2,8 @@
 const enum Direction {
     Left,
     Right,
-    Up,
-    Down
+    Top,
+    Bottom
 }
 
 export default Direction;
@@ -13,8 +13,8 @@ export default Direction;
 export function char(dir: Direction) {
     if (dir === Direction.Left) return 'L';
     if (dir === Direction.Right) return 'R';
-    if (dir === Direction.Up) return 'T';
-    if (dir === Direction.Down) return 'B';
+    if (dir === Direction.Top) return 'T';
+    if (dir === Direction.Bottom) return 'B';
 
     return '';
 }

@@ -19,13 +19,12 @@ This tool help solving Block moving game
 ### Blocked Box (BB)
 - Box is at a corner (blocked permanently at 2 both H(orizontal) & V(ertical) directions)
 - Box can only move along a line and there is not a possible Hole for that Box
-- Box that only possible Move is to becoming BB (as above cases)
-- A Box can be blocked temporarily when it is blocked by another block which can be moved
-	This Box is not a Blocked Box
+- Box which's only Move is to becoming BB (as above cases)
+- TBB (below) is not a BB.
 
 ### Temporarily Blocked Box (TBB)
 - Temporarily BB is a Box that can't be moved for now 
-	but if a nearby Box move, it can move too
+	but if a nearby Box move, it can move
 
 ### Reached Box (RB)
 - Box that is located on a Hole
@@ -38,7 +37,6 @@ This tool help solving Block moving game
 
 ### Heuristic Move
 - A Move that make a Box closer to a Hole
-
 
 ### Implementation
 

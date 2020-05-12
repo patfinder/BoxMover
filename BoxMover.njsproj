@@ -52,6 +52,8 @@
     <Folder Include="views\" />
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="src\Game.testing.ts" />
+    <TypeScriptCompile Include="src\utils.ts" />
     <TypeScriptCompile Include="src\Board.ts" />
     <TypeScriptCompile Include="src\Solver.ts" />
     <TypeScriptCompile Include="src\NodeState.ts" />

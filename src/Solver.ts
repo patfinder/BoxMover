@@ -28,9 +28,9 @@ export default class Solver {
         const graph = this.graph;
 
         // Create nodes
-        for (let x = 0; x < board.X; x++) {
-            // Y-1 cols
-            for (let y = 0; y < board.Y - 1; y++) {
+        for (let y = 0; y < board.Y; y++) {
+            // X-1 cols
+            for (let x = 0; x < board.X - 1; x++) {
 
                 const node = new Point(x, y);
                 const right = node.right;
@@ -45,17 +45,14 @@ export default class Solver {
                 if (board.isBox(node)) continue;
 
                 // Right is empty
-                if (board.isEmpty(right)) {
-                    graph.addLink(node.id, right.id);
+                if (board.isEmpty(right)) graph.addLink(node.id, right.id);
+
+                // Not the Last row
+                if (y < board.Y - 1) {
+                    // Bottom is empty
+                    if (board.isEmpty(bottom)) graph.addLink(node.id, bottom.id);
                 }
 
-                // Last row, no bottom
-                if (x === board.X - 1) continue;
-
-                // Bottom is empty
-                if (board.isEmpty(bottom)) {
-                    graph.addLink(node.id, bottom.id);
-                }
             }
         }
     }

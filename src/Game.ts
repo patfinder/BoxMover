@@ -7,57 +7,60 @@ import Board from './Board';
 import Point from './Point';
 import Solver from './Solver';
 
-try {
+function pivotTable(cells: Cell[][]) {
+    // Check if table is not rectangle
+    const rowLength = cells[0].length;
+    if (cells.some(row => row.length !== rowLength)) throw 'Not all rows have equal length.';
+}
+
+export function getBoard() {
     const O = Cell.Hole;
     const _ = Cell.Blank;
     const H = Cell.Wall;
     const X = Cell.Box;
 
-    const states = [
-        //     Y 0  1  2  3  4  5  6  7
-        // X
-        /* 0 */ [H, H, H, H, H, H, H, H],
-        /* 1 */ [H, _, _, _, _, _, _, H],
-        /* 2 */ [H, _, _, _, _, X, _, H],
-        /* 3 */ [H, _, _, _, H, _, _, H],
-        /* 4 */ [H, _, _, _, _, H, O, H],
-        /* 5 */ [H, H, H, H, H, H, H, H],
+    // NOTE: It is best to mark Cells outside game area with Wall (instead of Blank)
+    const boardInput = [
+            // Y   X 0  1  2  3  4  5  6  7
+            /* 0 */[H, H, H, H, H, H, H, H],
+            /* 1 */[H, _, _, _, _, _, _, H],
+            /* 2 */[H, _, _, _, _, X, _, H],
+            /* 3 */[H, _, _, _, H, _, _, H],
+            /* 4 */[H, _, _, _, _, H, O, H],
+            /* 5 */[H, H, H, H, H, H, H, H],
     ];
 
-    const XX = states.length;
-    const YY = states[0].length;
+    return boardInput;
+}
 
-    // Check cells state
-    for (let x = 0; x < XX; x++) {
+export function play() {
+    try {
+        const states = getBoard();
+        const XX = states[0].length;
+        const YY = states.length;
+
+        // Check cells state
         for (let y = 0; y < YY; y++) {
-            const pos = new Point(x, y);
-            const cell = states[x][y];
-            if (!isValidState(cell)) throw `Invalid cell ${pos.toString()} state: ${cChar(cell)}`
+            for (let x = 0; x < XX; x++) {
+                const pos = new Point(x, y);
+                const cell = states[y][x];
+                if (!isValidState(cell)) throw `Invalid cell ${pos.toString()} state: ${cChar(cell)}`
+            }
         }
+
+        // Game board
+        const game = new Board(XX, YY);
+        game.initBoard(states, new Point(1, 4));
+        game.printBoard();
+
+        // Solver
+        const solver = new Solver();
+        solver.createGraph(game);
+
+        // Play Game
+        console.log(`solver: ${solver}`);
     }
-
-    // Board
-    const board = new Board(XX, YY);
-    board.initBoard(states, new Point(4, 1));
-    board.printBoard();
-
-    // Solver
-    const solver = new Solver();
-    solver.createGraph(board);
-
-    const pos = new Point(3, 5); // 3,7 false
-    const path = board.getPath(solver.pathFinder, pos);
-    //const pathStr = path.map(n => n.id).join(' <- ');
-    //console.log(`Path: ${pos.toString()} - ${pathStr}`);
-    board.printBoardWithPath(path);
-
-    // ============================================================
-
-    console.log('Testing .....................');
-
+    catch (error) {
+        console.log('Error', error);
+    }
 }
-catch (error) {
-    console.log('Error', error);
-}
-
-console.log('wait');

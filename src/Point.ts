@@ -35,27 +35,27 @@ export default class Point {
     get left(): Point {
         const { x, y } = this;
 
-        if (y <= 0) return undefined;
-
-        return new Point(x, y - 1);
-    }
-
-    get right(): Point {
-        const { x, y } = this;
-        return new Point(x, y + 1);
-    }
-
-    get top(): Point {
-        const { x, y } = this;
-
         if (x <= 0) return undefined;
 
         return new Point(x - 1, y);
     }
 
-    get bottom(): Point {
+    get right(): Point {
         const { x, y } = this;
         return new Point(x + 1, y);
+    }
+
+    get top(): Point {
+        const { x, y } = this;
+
+        if (y <= 0) return undefined;
+
+        return new Point(x, y - 1);
+    }
+
+    get bottom(): Point {
+        const { x, y } = this;
+        return new Point(x, y + 1);
     }
 
     /*
@@ -76,8 +76,8 @@ export default class Point {
         if (dir === Direction.Left || dir === Direction.Right) {
             dx = dir === Direction.Left ? -1 : 1;
         }
-        else if (dir === Direction.Up || dir === Direction.Down) {
-            dy = dir === Direction.Up ? -1 : 1;
+        else if (dir === Direction.Top || dir === Direction.Bottom) {
+            dy = dir === Direction.Top ? -1 : 1;
         }
         else throw `Invalid dir ${dChar(dir)}`;
 

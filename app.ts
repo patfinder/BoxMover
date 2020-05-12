@@ -1,1 +1,1 @@
-import './src/Game';
+import './src/Game.testing';

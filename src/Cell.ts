@@ -38,16 +38,20 @@ export function char(cell: Cell) {
     return undefined;
 }
 
+/**
+ * Check cells conflicting state
+ * @param cell
+ */
 export function isValidState(cell: Cell) {
 
-    // Not Blank & Hole at the same time
+    // Blank & Hole at the same time
     if (cell & Cell.Blank && cell & Cell.Hole) return false;
 
-    // Not Wall & Box at the same time
+    // Wall & Box at the same time
     if (cell & Cell.Wall && cell & Cell.Box) return false;
 
-    // How about Wall & Hole?
-    // Maybe its valid but unsolvable
+    // Wall & Hole at the same time
+    if (cell & Cell.Wall && cell & Cell.Hole) return false;
 
     return true;
 }
