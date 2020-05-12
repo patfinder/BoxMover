@@ -33,6 +33,14 @@ export function getBoard() {
     return boardInput;
 }
 
+function pushState() {
+    throw `Not implemnted`;
+}
+
+function popState() {
+    throw `Not implemnted`;
+}
+
 export function play() {
     try {
         const states = getBoard();

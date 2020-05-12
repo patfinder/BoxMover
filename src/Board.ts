@@ -4,7 +4,7 @@ import * as pathLib from 'ngraph.path';
 import Cell, { isValidState, char as cChar } from './Cell';
 import Direction from './Direction';
 import Point, { parseId } from './Point';
-import { CNodeData } from './Solver';
+import { BNodeData } from './Solver';
 import { pad } from './utils';
 
 /**
@@ -31,6 +31,8 @@ export default class Board {
     cells: Cell[][];
     boxCount: number;
     manPos: Point;
+    states: Cell[][][]; // Array of states
+    graph: graphLib.Graph;
 
 	/**
 	 * 
@@ -47,6 +49,8 @@ export default class Board {
         for (let y = 0; y < Y; y++) {
             this.cells[y] = [];
         }
+
+        this.states = [];
     }
 
 	/**
@@ -233,16 +237,8 @@ export default class Board {
         throw `Not implemnted`;
     }
 
-    pushState() {
-        throw `Not implemnted`;
-    }
-
-    popState() {
-        throw `Not implemnted`;
-    }
-
-    walkAlongAWall() {
-        // TODO:
+    get copy() {
+        return this.cells.map(aRow => [...aRow]);
     }
 
     isBlockedBox(me: Point) {
@@ -255,11 +251,44 @@ export default class Board {
         return this.blockedOnX(me) && this.blockedOnY(me);
     }
 
+    pushState() {
+        const state = this.copy;
+        this.states.push(state);
+        return state;
+    }
+
+    popState() {
+        const state = this.states.push(this.copy);
+        return state;
+    }
+
     /*
      * This Box has reached Goal.
      */
     reachGoal(me: Point) {
         return this.isBox(me) && this.isHole(me);
+    }
+
+    /**
+     * Push the Box at specified point
+     * @param box
+     * @param dir
+     */
+    pushBox(box: Point, dir: Direction) {
+        if (!this.isBox(box)) throw `${box.str} is not a Box`;
+
+        if()
+    }
+
+    isWalkingAlongXWall(me: Point) {
+        const manPos = this.manPos;
+        let stepCount = 0;
+
+        // Walk left and then right
+
+        // Restore
+        for (let i = 0; i < stepCount; i++) this.popState();
+        this.manPos = manPos;
     }
 
 	/**
@@ -320,7 +349,7 @@ export default class Board {
 	 * Find Man shortest path to specified pos
 	 * @param pos target pos
 	 */
-    walkTo(pathFinder: pathLib.PathFinder<CNodeData>, pos: Point): graphLib.Node<CNodeData>[] {
+    walkTo(pathFinder: pathLib.PathFinder<BNodeData>, pos: Point): graphLib.Node<BNodeData>[] {
         return pathFinder.find(this.manPos.id, pos.id);
     }
 

@@ -1,18 +1,19 @@
 import * as graphLib from 'ngraph.graph';
-import { Graph } from 'ngraph.graph';
 import * as pathLib from 'ngraph.path';
-import { PathFinder } from 'ngraph.path';
 
 import Board from "./Board";
 import Point from "./Point";
 
 // Graph NodeData for cell
-export type CNodeData = number;
+export type BNodeData = number;
+
+type BGraph = graphLib.Graph<BNodeData>;
+type BPathFinder = pathLib.PathFinder<BNodeData>;
 
 export default class Solver {
     initialBoard: Board;
-    graph: graphLib.Graph<CNodeData>;
-    pathFinder: PathFinder<CNodeData>;
+    graph: BGraph;
+    pathFinder: BPathFinder;
 
     //constructor() {
     //}
