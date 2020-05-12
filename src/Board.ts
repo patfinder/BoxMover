@@ -166,7 +166,47 @@ export default class Board {
         return this.isWall(pos.top) || this.isWall(pos.bottom);
     }
 
+    blockedOnX(me: Point): boolean {
+
+        if (!this.isBox(me)) throw 'Not a Box';
+
+        if (this.hasWallOnX(me)) return true;
+
+        const left = me.left, right = me.right;
+
+        if (this.isBox(left) && this.isWall(left.left)) return true;
+
+        if (this.isBox(right) && this.isWall(right.right)) return true;
+
+        return false;
+    }
+
+    blockedOnY(me: Point): boolean {
+
+        if (!this.isBox(me)) throw 'Not a Box';
+
+        if (this.hasWallOnY(me)) return true;
+
+        const top = me.top, bottom = me.bottom;
+
+        if (this.isBox(top) && this.isWall(top.top)) return true;
+
+        if (this.isBox(bottom) && this.isWall(bottom.bottom)) return true;
+
+        return false;
+    }
+
+    /**
+     * 
+     * @param me
+     * @param them
+     */
     needThemMoveToMove(me: Point, them: Point) {
+
+        if (!this.isBox(me)) throw `${me.str} is not a Box`;
+
+        if (!this.isBox(them)) throw `${them.str} is not a Box`;
+
         // They are on X
         if ((them.equal(me.left) || them.equal(me.right)) && this.hasWallOnY(me)) return true;
 
@@ -176,38 +216,75 @@ export default class Board {
         return false;
     }
 
+    isAtCorner(me: Point): boolean {
+        if (!this.isBox(me)) throw `${me.str} is not a Box`;
+
+        return this.hasWallOnX(me) && this.hasWallOnY(me);
+    }
+
     /**
      * Box at specified Box can only move on one Direction (H or V)
      * @param pos Position of the Box
      */
-    onlyMoveOneDirection(pos): Direction {
-        if (!this.isBox(pos)) throw `Current pos${pos.str} must be a Box`;
+    onlyMoveOneDirection(me: Point): Direction {
+        //if(this.blo)
 
-        // TODO: 
-        throw 'Not implemented'
+        // TODO
+        throw `Not implemnted`;
+    }
+
+    pushState() {
+        throw `Not implemnted`;
+    }
+
+    popState() {
+        throw `Not implemnted`;
+    }
+
+    walkAlongAWall() {
+        // TODO:
     }
 
     isBlockedBox(me: Point) {
-        if (!this.isBox(me)) return false; 
 
-        const nearBys = [me.left, me.right, me.top, me.bottom];
+        if (!this.isBox(me)) throw `${me.str} is not a Box`;
 
-        return nearBys.some(near => this.needThemMoveToMove(me, near) && this.needThemMoveToMove(near, me));
+        // Is at a corner
+        if (this.isAtCorner(me)) return true;
+
+        return this.blockedOnX(me) && this.blockedOnY(me);
     }
 
     /*
      * This Box has reached Goal.
      */
-    reachGoal = (me: Point) => this.isBox(me) && this.isHole(me);
+    reachGoal(me: Point) {
+        return this.isBox(me) && this.isHole(me);
+    }
 
 	/**
-	 * Check if two board are equal
+	 * Check if two board are equal which means Boxes are at the same place
+     * And man can walk from position on this board to position on the other board
 	 * @param {any} board2
 	 */
-    isEqual(/*board2*/) {
-        // TODO: isEqual
-        throw 'Not implemented';
-        //return this.boxCount === board2.boxCount
+    isEqual(board2: Board) {
+
+        // In one game, this may not neccessary
+        if (this.boxCount !== board2.boxCount) return false;
+
+        // Compare all the Boxes
+        for (let y = 0; y < this.Y - 1; y++) {
+            for (let x = 0; x < this.X - 1; x++) {
+                const pos = new Point(x, y);
+                if (this.isBox(pos) && !board2.isBox(pos)) return false;
+            }
+        }
+
+        // Check if man can walk
+        if (this.manPos.equal(board2.manPos)) return true;
+
+        // TODO: pathFinder
+        return this.walkTo(null, board2.manPos).length !== 0;
     }
 
     printBoard(points: Point[] = [], pathChar = '.') {

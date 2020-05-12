@@ -61,7 +61,9 @@ export default class Point {
     /*
      * Get near-by Points with order: Left, Right, Top, Bottom
      */
-    nearBys = () => [this.left, this.right, this.top, this.bottom];
+    get nearBys() {
+        return [this.left, this.right, this.top, this.bottom];
+    }
 
     equal = (pos: Point) => pos.x === this.x && pos.y === this.y;
 
