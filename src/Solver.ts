@@ -6,9 +6,8 @@ import Point from "./Point";
 
 // Graph NodeData for cell
 export type BNodeData = number;
-
-type BGraph = graphLib.Graph<BNodeData>;
-type BPathFinder = pathLib.PathFinder<BNodeData>;
+export type BGraph = graphLib.Graph<BNodeData>;
+export type BPathFinder = pathLib.PathFinder<BNodeData>;
 
 export default class Solver {
     initialBoard: Board;
@@ -19,7 +18,7 @@ export default class Solver {
     //}
 
     createGraph(board: Board) {
-        this.graph = (graphLib as any)();
+        this.graph = (graphLib as any)(); /* tslint:disable:no-explicit-any */
         this.pathFinder = pathLib.aStar(this.graph, {
             //distance: (_from, _to, link) => {
             //    return link.data.weight;

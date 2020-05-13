@@ -1,9 +1,9 @@
 
 const enum Direction {
-    Left    = 0x04,
-    Right   = 0x05,
-    Top     = 0x40,
-    Bottom  = 0x50,
+    Left    = 0x03,
+    Right   = 0x0C,
+    Top     = 0x30,
+    Bottom  = 0xC0,
 
     // Get Blank or Hole part
     XNibble = 0x0F,
@@ -21,5 +21,14 @@ export function char(dir: Direction) {
     if (dir === Direction.Top) return 'T';
     if (dir === Direction.Bottom) return 'B';
 
-    return '';
+    throw `Invalid direction ${dir}`;
+}
+
+export function opposite(dir: Direction) {
+    if (dir === Direction.Left) return Direction.Right;
+    if (dir === Direction.Right) return Direction.Left;
+    if (dir === Direction.Top) return Direction.Bottom;
+    if (dir === Direction.Bottom) return Direction.Top;
+
+    throw `Invalid direction ${dir}`;
 }

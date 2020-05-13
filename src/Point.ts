@@ -1,4 +1,4 @@
-import Direction, { char as dChar } from "./Direction";
+import Direction, { char as dChar, opposite } from "./Direction";
 
 export function id(pos: Point): string {
     return `${pos.x}-${pos.y}`
@@ -84,5 +84,9 @@ export default class Point {
         else throw `Invalid dir ${dChar(dir)}`;
 
         return new Point(x + dx, y + dy);
+    }
+
+    opposite(dir: Direction): Point {
+        return this.adjacent(opposite(dir));
     }
 }

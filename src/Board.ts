@@ -4,7 +4,7 @@ import * as pathLib from 'ngraph.path';
 import Cell, { isValidState, char as cChar } from './Cell';
 import Direction from './Direction';
 import Point, { parseId } from './Point';
-import { BNodeData } from './Solver';
+import { BNodeData, BGraph, BPathFinder } from './Solver';
 import { pad } from './utils';
 
 /**
@@ -32,7 +32,8 @@ export default class Board {
     boxCount: number;
     manPos: Point;
     states: Cell[][][]; // Array of states
-    graph: graphLib.Graph;
+    graph: BGraph;
+    pathFinder: BPathFinder;
 
 	/**
 	 * 
@@ -71,6 +72,10 @@ export default class Board {
 
         // man pos
         this.manPos = new Point(manPos.x, manPos.y);
+
+        // Check valid
+        const validate = this.validate();
+        if (validate) throw `Invalid board state: ${validate}`;
     }
 
 	/**
@@ -230,15 +235,22 @@ export default class Board {
      * Box at specified Box can only move on one Direction (H or V)
      * @param pos Position of the Box
      */
-    onlyMoveOneDirection(me: Point): Direction {
+    onlyMoveOneDirection(/*me: Point*/): Direction {
         //if(this.blo)
 
         // TODO
         throw `Not implemnted`;
     }
 
-    get copy() {
+    get copyState() {
         return this.cells.map(aRow => [...aRow]);
+    }
+
+    get copy() {
+        const copy = new Board(this.X, this.Y);
+        copy.initBoard(this.copyState, this.manPos);
+
+        return copy;
     }
 
     isBlockedBox(me: Point) {
@@ -252,13 +264,13 @@ export default class Board {
     }
 
     pushState() {
-        const state = this.copy;
+        const state = this.copyState;
         this.states.push(state);
         return state;
     }
 
     popState() {
-        const state = this.states.push(this.copy);
+        const state = this.states.push(this.copyState);
         return state;
     }
 
@@ -269,6 +281,20 @@ export default class Board {
         return this.isBox(me) && this.isHole(me);
     }
 
+    canPush(box: Point, dir: Direction) {
+        if (!this.isBox(box)) return false;
+
+        // Destination
+        const destination = box.adjacent(dir);
+        const stand = box.opposite(dir);
+
+        // Check if the new pos is empty
+        if (!this.isEmpty(destination)) return false;
+
+        // Stand is reachable
+        if (!this.canWalkTo(stand)) return false;
+    }
+
     /**
      * Push the Box at specified point
      * @param box
@@ -277,18 +303,52 @@ export default class Board {
     pushBox(box: Point, dir: Direction) {
         if (!this.isBox(box)) throw `${box.str} is not a Box`;
 
-        if()
+        // Destination
+        const destination = box.adjacent(dir);
+        const stand = box.opposite(dir);
+
+        // Check if the new pos is empty
+        if (!this.canPush(box, dir)) throw `Invalid destination ${destination.str} or Stand ${stand.str} is unreachable`;
+
+        const { x: bx, y: by } = box;
+        const { x: dx, y: dy } = destination;
+
+        // Everything ok, update state
+        const isHole = this.isHole(box);
+        this.cells[dy][dx] = Cell.Box;
+        this.cells[by][bx] = isHole ? Cell.Hole : Cell.Blank;
+        this.manPos = box;
     }
 
-    isWalkingAlongXWall(me: Point) {
+    isMovingAlongXWall(box: Point) {
         const manPos = this.manPos;
         let stepCount = 0;
+        let cont: boolean;
+        let isTrue = true;
 
-        // Walk left and then right
+        if (!this.isBox(box)) throw `Not a box ${box.str}`;
+
+        // Walk left
+        do {
+            // Check Y is wall
+            if (!this.hasWallOnY(box)) {
+                isTrue = false;
+                break;
+            }
+
+            if (!this.canPush(box, Direction.Left)) {
+            }
+
+
+            this.pushBox(box, Direction.Left);
+            stepCount++;
+        } while (cont);
 
         // Restore
         for (let i = 0; i < stepCount; i++) this.popState();
         this.manPos = manPos;
+
+        if(!isTrue)
     }
 
 	/**
@@ -312,8 +372,7 @@ export default class Board {
         // Check if man can walk
         if (this.manPos.equal(board2.manPos)) return true;
 
-        // TODO: pathFinder
-        return this.walkTo(null, board2.manPos).length !== 0;
+        return this.walkTo(board2.manPos).length !== 0;
     }
 
     printBoard(points: Point[] = [], pathChar = '.') {
@@ -349,8 +408,16 @@ export default class Board {
 	 * Find Man shortest path to specified pos
 	 * @param pos target pos
 	 */
-    walkTo(pathFinder: pathLib.PathFinder<BNodeData>, pos: Point): graphLib.Node<BNodeData>[] {
-        return pathFinder.find(this.manPos.id, pos.id);
+    walkTo(pos: Point): graphLib.Node<BNodeData>[] {
+        return this.pathFinder.find(this.manPos.id, pos.id);
+    }
+
+    canWalkTo(pos: Point): boolean {
+        if (this.manPos.equal(pos)) return true;
+
+        const path = this.walkTo(pos);
+
+        return Boolean(path.length);
     }
 
     printBoardWithPath(path: graphLib.Node[]) {

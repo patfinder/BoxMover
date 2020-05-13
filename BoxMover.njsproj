@@ -49,10 +49,12 @@
     <Folder Include="public\stylesheets\" />
     <Folder Include="routes\" />
     <Folder Include="src\" />
+    <Folder Include="src\test\" />
     <Folder Include="views\" />
   </ItemGroup>
   <ItemGroup>
-    <TypeScriptCompile Include="src\Game.testing.ts" />
+    <TypeScriptCompile Include="src\test\Board.testing.ts" />
+    <TypeScriptCompile Include="src\test\Game.testing.ts" />
     <TypeScriptCompile Include="src\utils.ts" />
     <TypeScriptCompile Include="src\Board.ts" />
     <TypeScriptCompile Include="src\Solver.ts" />
