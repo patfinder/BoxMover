@@ -30,6 +30,7 @@ export default class Board {
     // x first index, y second index
     cells: Cell[][];
     boxCount: number;
+    holes: Point[];
     manPos: Point;
     states: Cell[][][]; // Array of states
     graph: BGraph;
@@ -66,7 +67,11 @@ export default class Board {
         // Init cells
         for (let y = 0; y < this.Y; y++) {
             for (let x = 0; x < this.X; x++) {
+                const cell = new Point(x, y);
                 this.cells[y][x] = board[y][x];
+
+                // Hole pos
+                if (this.isHole(cell)) this.holes.push(cell);
             }
         }
 
@@ -326,6 +331,9 @@ export default class Board {
         let cont: boolean;
         let isTrue = true;
 
+        // TODO
+        throw 'Not implemented';
+
         if (!this.isBox(box)) throw `Not a box ${box.str}`;
 
         // Walk left
@@ -348,7 +356,27 @@ export default class Board {
         for (let i = 0; i < stepCount; i++) this.popState();
         this.manPos = manPos;
 
-        if(!isTrue)
+        //if(!isTrue)1
+    }
+
+    isMovingAlongYWall(/*box: Point*/) {
+        // TODO
+        throw 'Not implemented';
+    }
+
+    distance(box: Point): number {
+        if (!this.isBox(box)) throw `Not a box: ${box.str}`;
+
+
+    }
+
+    /**
+     * Get current board position score
+     */
+    get score(): number {
+        // Loop: Find Box closest to a Hole
+        // Calculate point which is invert of distance
+
     }
 
 	/**
