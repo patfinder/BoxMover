@@ -367,7 +367,13 @@ export default class Board {
     distance(box: Point): number {
         if (!this.isBox(box)) throw `Not a box: ${box.str}`;
 
+        // TODO
+        let currentIdx = 0;
+        let currentScore = Number.MAX_SAFE_INTEGER;
 
+        for (let i = 0; i < this.holes.length - 1; i++) {
+
+        }
     }
 
     /**
